@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://dhyad7y5qpd2h"]
+
+[ext_resource type="Script" uid="uid://wd20spy1j1b7" path="res://addons/yukys_kits/excel_import_tools/script/import_dock.gd" id="1_import_dock"]
+
+[node name="ImportDock" type="Control" unique_id=1370892499]
+custom_minimum_size = Vector2(336, 0)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_import_dock")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=41700692]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBox1" type="HBoxContainer" parent="VBox" unique_id=2080218703]
+layout_mode = 2
+
+[node name="CsvLabel" type="Label" parent="VBox/HBox1" unique_id=1397446122]
+layout_mode = 2
+text = "导入文件"
+
+[node name="CsvPathEdit" type="LineEdit" parent="VBox/HBox1" unique_id=1415646575]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SelectCsvButton" type="Button" parent="VBox/HBox1" unique_id=1162794081]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "选择"
+
+[node name="HBox2" type="HBoxContainer" parent="VBox" unique_id=1443541098]
+layout_mode = 2
+
+[node name="OutputLabel" type="Label" parent="VBox/HBox2" unique_id=811515022]
+layout_mode = 2
+text = "导出路径"
+
+[node name="OutputPathEdit" type="LineEdit" parent="VBox/HBox2" unique_id=1330922906]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SelectOutputButton" type="Button" parent="VBox/HBox2" unique_id=2147237092]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "选择"
+
+[node name="ImportButton" type="Button" parent="VBox" unique_id=1600601650]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "导表"
+
+[node name="HBox3" type="HBoxContainer" parent="VBox" unique_id=2024640537]
+layout_mode = 2
+
+[node name="DataLabel" type="Label" parent="VBox/HBox3" unique_id=1373067600]
+layout_mode = 2
+text = "数据库路径"
+
+[node name="DataPathEdit" type="LineEdit" parent="VBox/HBox3" unique_id=521525219]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "res://data"
+editable = false
+
+[node name="SelectDataButton" type="Button" parent="VBox/HBox3" unique_id=410647780]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "设置"
+
+[node name="StatusLabel" type="Label" parent="VBox" unique_id=981659951]
+layout_mode = 2
+text = "就绪"
+
+[node name="DataTree" type="Tree" parent="VBox" unique_id=1331614723]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CsvFileDialog" type="FileDialog" parent="." unique_id=1478308213]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.csv ; CSV 表格 (*.csv)")
+
+[node name="OutputDirDialog" type="FileDialog" parent="." unique_id=1205448036]
+title = "Open a Directory"
+file_mode = 2
+
+[node name="DataDirDialog" type="FileDialog" parent="." unique_id=1561104531]
+title = "Open a Directory"
+file_mode = 2

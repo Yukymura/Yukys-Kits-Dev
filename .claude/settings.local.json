@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"/d/Project/Godot/3d俄罗斯方块\" 2>&1 | head -40; echo \"=== 搜索导表相关文件 ===\"; find \"/d/Project/Godot/3d俄罗斯方块\" -maxdepth 4 -iname \"*导表*\" -o -maxdepth 4 -iname \"*excel*\" -o -maxdepth 4 -iname \"*import*\" 2>/dev/null | head -60)",
+      "Read(//d/Project/Godot/3d俄罗斯方块/**)",
+      "mcp__godot-ai__editor_state",
+      "mcp__godot-ai__logs_read",
+      "Bash(xxd)",
+      "mcp__godot-ai__project_run",
+      "mcp__godot-ai__editor_manage",
+      "mcp__godot-ai__project_manage",
+      "mcp__godot-ai__api_manage",
+      "WebSearch"
+    ]
+  }
+}

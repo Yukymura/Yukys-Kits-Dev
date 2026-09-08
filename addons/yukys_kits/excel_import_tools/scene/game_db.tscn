@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://addons/yukys_kits/excel_import_tools/script/game_db.gd" id="1_game_db"]
+
+[node name="GameDB" type="Node"]
+script = ExtResource("1_game_db")
