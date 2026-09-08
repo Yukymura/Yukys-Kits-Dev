@@ -16,3 +16,21 @@
 [2026-09-08T12:13:00] [INFO] DataImporter 初始化完成，导出路径: res://data
 [2026-09-08T12:13:48] [INFO] DataImporter 初始化完成，导出路径: res://data
 [2026-09-08T12:55:24] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T13:08:29] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T13:09:41] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T22:49:09] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T22:54:07] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T23:05:49] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T23:27:40] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T23:33:21] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T23:45:01] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-08T23:53:32] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/方块组数据.csv -> res://data/
+[2026-09-08T23:53:32] [DONE] 导表成功: res://data/tetromino_data.json（16 行）
+[2026-09-09T00:29:34] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T00:32:34] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T00:37:03] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T00:41:28] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T00:41:59] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/方块组数据.csv -> res://data/
+[2026-09-09T00:41:59] [DONE] 导表成功: res://data/tetromino_data.json（16 行）
+[2026-09-09T00:42:37] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T01:20:41] [INFO] DataImporter 初始化完成，导出路径: res://data

@@ -10,7 +10,19 @@
       "mcp__godot-ai__editor_manage",
       "mcp__godot-ai__project_manage",
       "mcp__godot-ai__api_manage",
-      "WebSearch"
+      "WebSearch",
+      "Bash(command -v pwsh.exe pwsh powershell.exe powershell)",
+      "Read(//c/Program Files/**)",
+      "Bash(command -v winget.exe winget)",
+      "Bash(python -c \"import godot_ai, os; print\\(os.path.dirname\\(godot_ai.__file__\\)\\)\")",
+      "Bash(pip show *)",
+      "Bash('$_.CreationDate')",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command 'Get-CimInstance Win32_Process -Filter '\\\\''ProcessId = 13532'\\\\'' | ForEach-Object { \"__CMDSUB_OUTPUT__|$\\($_.CommandLine\\)\" }; Write-Output \\('\\\\''EXITCODE_TEST_DONE'\\\\''\\)')",
+      "Bash(echo \"=== exit=$? ===\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command 'Get-CimInstance Win32_Process -Filter \"ProcessId = 13532\" | ForEach-Object { \"$\\($_.CreationDate\\)|$\\($_.CommandLine\\)\" }')",
+      "Bash(echo \"exit=$?\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command 'Get-CimInstance Win32_Process -Filter \"ProcessId = 999999\" | ForEach-Object { \"$\\($_.CreationDate\\)|$\\($_.CommandLine\\)\" }')",
+      "Bash(find . -maxdepth 2 -type d -not -path '*/\\\\.*')"
     ]
   }
 }

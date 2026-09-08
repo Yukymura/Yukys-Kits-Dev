@@ -457,12 +457,12 @@
 			"weight": 0.5
 		}
 	},
-	"import_path": "G:/Work/Godot/GodotProj/插件开发测试项目/tables/方块组数据.csv",
+	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/方块组数据.csv",
 	"table_name": "tetromino_data",
 	"types": {
 		"block_pos": "Array[Vector3i]",
 		"type": "String",
 		"weight": "float"
 	},
-	"update_time": "2026-09-08T01:36:16"
+	"update_time": "2026-09-09T00:41:59"
 }

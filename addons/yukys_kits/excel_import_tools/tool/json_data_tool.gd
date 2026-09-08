@@ -1,5 +1,5 @@
 # ================================================================================
-# JsonDataTool —— 结构化数据 与 JSON 文件互转
+# JsonDataTool —— 结构化数据 与 JSON 文件互转（load_file 返回含 types）
 #
 # 写入：把 CsvParser 的解析结果转换为类型化字典，序列化为 JSON 文件。
 # 读取：加载导出目录下的所有 JSON，并把 JSON 值还原为 Godot 类型。
@@ -103,7 +103,7 @@ static func load_all(dir_path: String) -> Dictionary:
 	_load_dir(dir_path, result)
 	return result
 
-# 返回 { ok: bool, data: { table_name, data } / error }
+# 返回 { ok: bool, data: { table_name, data, types } / error }
 static func load_file(file_path: String) -> Dictionary:
 	if not FileAccess.file_exists(file_path):
 		return _fail("文件不存在: %s" % file_path)
@@ -129,7 +129,7 @@ static func load_file(file_path: String) -> Dictionary:
 			out_row[field] = json_to_value(row[field], str(types_dict.get(field, "")))
 		converted[_convert_id(key)] = out_row
 
-	return _ok({"table_name": parsed["table_name"], "data": converted})
+	return _ok({"table_name": parsed["table_name"], "data": converted, "types": types_dict})
 
 # JSON 值 → Godot 类型值
 static func json_to_value(value, type_str: String):
