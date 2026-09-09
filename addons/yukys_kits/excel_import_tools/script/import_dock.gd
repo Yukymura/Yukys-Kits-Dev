@@ -22,6 +22,10 @@ const TREE_ALLOWED_EXTENSIONS: Array = ["json"]
 
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
+var _importer: Variant
+
+func set_importer(importer) -> void:
+	_importer = importer
 
 func _ready() -> void:
 	_setup()
@@ -58,8 +62,8 @@ func _connect_signals() -> void:
 	output_dir_dialog.dir_selected.connect(_on_output_selected)
 	data_dir_dialog.dir_selected.connect(_on_data_dir_selected)
 
-	DataImporter.export_path_changed.connect(_refresh_data_path)
-	DataImporter.files_changed.connect(_refresh_tree)
+	_importer.export_path_changed.connect(_refresh_data_path)
+	_importer.files_changed.connect(_refresh_tree)
 
 	data_tree.item_selected.connect(_on_tree_item_selected)
 
@@ -82,10 +86,10 @@ func _on_output_selected(path: String) -> void:
 	output_path_edit.text = path + "/"
 
 func _on_data_dir_selected(path: String) -> void:
-	DataImporter.set_export_path(path)
+	_importer.set_export_path(path)
 
 func _on_import_pressed() -> void:
-	var r := DataImporter.import_csv(csv_path_edit.text.strip_edges(), output_path_edit.text.strip_edges())
+	var r: Dictionary = _importer.import_csv(csv_path_edit.text.strip_edges(), output_path_edit.text.strip_edges())
 	_set_status(r["message"], r["ok"])
 
 # ================================================================================
@@ -96,11 +100,11 @@ func _set_status(text: String, ok: bool) -> void:
 	status_label.modulate = Color(0.4, 0.9, 0.4) if ok else Color(1.0, 0.4, 0.4)
 
 func _refresh_data_path() -> void:
-	data_path_edit.text = DataImporter.get_export_path()
+	data_path_edit.text = _importer.get_export_path()
 	_refresh_tree()
 
 func _refresh_tree() -> void:
-	var path := DataImporter.get_export_path()
+	var path: String = _importer.get_export_path()
 	_load_tree(path)
 	_dir_snapshot = _dir_signature(path)
 
@@ -144,7 +148,7 @@ func _populate(parent: TreeItem, dir_path: String) -> void:
 # 文件监听（数据目录变更时自动刷新数据树）
 
 func _on_watch_timeout() -> void:
-	var path := DataImporter.get_export_path()
+	var path: String = _importer.get_export_path()
 	var sig := _dir_signature(path)
 	if sig != _dir_snapshot:
 		_dir_snapshot = sig
@@ -184,4 +188,4 @@ func _on_tree_item_selected() -> void:
 	var path: String = item.get_meta("full_path", "")
 	if path.is_empty() or path.get_extension().to_lower() != "json":
 		return
-	DataImporter.request_preview(path)
+	_importer.request_preview(path)

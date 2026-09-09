@@ -6,23 +6,25 @@ description: 使用 Yuky's Kits 的导表工具（excel_import_tools）时使用
 # 导表（excel_import_tools）
 
 把「规定格式」的 CSV 表格导出为 JSON 数据文件，并在游戏内通过 `GameDB` 访问。
-插件根目录：`addons/yukys_kits/`，导表工具子目录：`addons/yukys_kits/excel_import_tools/`。
+插件根目录：`addons/yukys_kits/`。
+- `runtime/` —— 游戏代码（随游戏导出）。
+- `excel_import_tools/` —— 编辑器工具代码（导出时排除）。
 
 ## 导表相关代码指引
 
 ### 目录结构
 
-| 路径 | 作用 |
-| --- | --- |
-| `excel_import_tools/script/data_importer.gd` | 导表 autoload 单例 `DataImporter`，串起整个导表流程 |
-| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、导出路径、数据目录、触发导表） |
-| `excel_import_tools/script/game_db.gd` | 运行时 autoload `GameDB`，游戏内取数据 |
-| `excel_import_tools/script/data_preview.gd` | 主面板「数据预览」，把 JSON 渲染成表格 |
-| `excel_import_tools/tool/csv_parser.gd` | 解析规定格式 CSV |
-| `excel_import_tools/tool/json_data_tool.gd` | CSV 解析结果 ↔ JSON 文件互转，类型转换 |
-| `excel_import_tools/tool/config_tool.gd` | 读写 `config.json` |
-| `excel_import_tools/tool/logger.gd` | 导表日志 |
-| `excel_import_tools/config.json` | 配置：`export_path` / `log_path` / `dock_name` |
+| 路径 | 作用 | 导出 |
+| --- | --- | --- |
+| `runtime/game_db.gd` | 运行时 autoload `GameDB`，游戏内取数据 | ✅ |
+| `runtime/json_data_tool.gd` | JSON 读写 + 类型转换（编辑器写 / 运行时读共用） | ✅ |
+| `excel_import_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程 | ❌ |
+| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、导出路径、数据目录、触发导表） | ❌ |
+| `excel_import_tools/script/data_preview.gd` | 主面板「数据预览」，把 JSON 渲染成表格 | ❌ |
+| `excel_import_tools/tool/csv_parser.gd` | 解析规定格式 CSV | ❌ |
+| `excel_import_tools/tool/config_tool.gd` | 读写 `config.json` | ❌ |
+| `excel_import_tools/tool/logger.gd` | 导表日志 | ❌ |
+| `excel_import_tools/config.json` | 配置：`export_path` / `log_path` / `dock_name` | ❌ |
 
 ### 导表流程（代码调用链）
 
@@ -37,10 +39,9 @@ import_dock._on_import_pressed()
 关键函数签名：
 
 ```gdscript
-# DataImporter（autoload）
+# DataImporter（编辑器专用实例，不随游戏导出）
 DataImporter.import_csv(csv_path, output_dir) -> { ok, message }
-DataImporter.load_data_file(path)             -> { ok, data:{table_name, data, types} / error }
-DataImporter.get_all_data()                   -> { 表名: { id: {字段:值} } }
+DataImporter.load_data_file(path)             -> { ok, data:{table_name, data, types} / error }  # 预览用
 DataImporter.set_export_path(path)
 DataImporter.request_preview(path)            # 触发主面板预览
 
@@ -94,8 +95,9 @@ GameDB.get_row("表名", id)  # {字段:值}
 
 ### 前置条件
 
-- `DataImporter` 与 `GameDB` 均为 `project.godot` 里的静态 autoload 单例，游戏运行时可直接按名称访问，无需手动加载。
-- `GameDB._ready()` 会在启动时通过 `DataImporter.get_all_data()` 一次性把 `export_path` 目录下所有 JSON 载入内存。
+- `GameDB` 是 `project.godot` 里的静态 autoload，游戏运行时直接按名称访问。
+- `DataImporter` 是编辑器专用实例（由 plugin.gd 创建并注入 dock/preview），**不随游戏导出**，运行时不可用。
+- `GameDB._ready()` 会在启动时通过 `JsonData.load_all(DATA_DIR)` 一次性把 `res://data` 下所有 JSON 载入内存（`DATA_DIR` 是 `game_db.gd` 里的常量，需与编辑器 `export_path` 默认值一致）。
 
 ### 取数 API
 
@@ -131,18 +133,17 @@ var tags: Array = GameDB.get_row("ItemTable", 1)["tags"]  # ["武器", "近战"]
   - `Array[T]` → `Array`，元素按 `T` 递归还原
 - 取不存在的表/行返回空 `Dictionary`（`{}`），不报错，业务代码按需判空。
 
-### 直接走 DataImporter（编辑器或运行时）
+### 编辑器内读单文件（预览用）
 
 ```gdscript
-# 读单个 JSON 文件：{ ok, data:{table_name, data, types} / error }
+# DataImporter 仅供编辑器使用；读单个 JSON（含 types）
 var r := DataImporter.load_data_file("res://data/ItemTable.json")
 if r.ok:
 	var rows: Dictionary = r.data["data"]   # { 1: {字段:值}, ... }
 	var types: Dictionary = r.data["types"] # { 字段: "类型", ... }
-
-# 读整个导出目录（GameDB 底层就是调它）
-var all: Dictionary = DataImporter.get_all_data()  # { 表名: { id: {字段:值} } }
 ```
+
+运行时读整目录请直接走 `GameDB`（`get_table` / `get_row`），或调用 `JsonData.load_all("res://data")`。
 
 ## 导表 log 读取方法
 

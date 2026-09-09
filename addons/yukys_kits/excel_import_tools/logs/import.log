@@ -34,3 +34,13 @@
 [2026-09-09T00:41:59] [DONE] 导表成功: res://data/tetromino_data.json（16 行）
 [2026-09-09T00:42:37] [INFO] DataImporter 初始化完成，导出路径: res://data
 [2026-09-09T01:20:41] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T17:02:51] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T17:02:54] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T17:04:26] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/特殊方块数据.csv -> res://data/
+[2026-09-09T17:04:26] [DONE] 导表成功: res://data/key_block_data.json（3 行）
+[2026-09-09T17:18:00] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T17:22:48] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T23:34:07] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T23:59:06] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-09T23:59:58] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/方块组数据.csv -> res://data/
+[2026-09-09T23:59:58] [DONE] 导表成功: res://data/tetromino_data.json（16 行）

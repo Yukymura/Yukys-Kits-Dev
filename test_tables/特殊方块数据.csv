@@ -1,0 +1,6 @@
+﻿key_block_data,,,,
+#,方块名,网格,颜色,材质
+*id,name:String,mesh:String,color:String,material:String
+1001,cube_red,cube,red,metal
+1002,cube_blue,cube,blue,metal
+1003,cube_green,cube,green,metal

@@ -8,6 +8,11 @@ extends Control
 @onready var path_label: Label = $VBox/Header/PathLabel
 @onready var preview_tree: Tree = $VBox/PreviewTree
 
+var _importer: Variant
+
+func set_importer(importer) -> void:
+	_importer = importer
+
 func show_preview(path: String) -> void:
 	path_label.text = path
 	_render(path)
@@ -15,7 +20,7 @@ func show_preview(path: String) -> void:
 func _render(path: String) -> void:
 	preview_tree.clear()
 	preview_tree.hide_root = true
-	var r := DataImporter.load_data_file(path)
+	var r: Dictionary = _importer.load_data_file(path)
 	if not r.ok:
 		preview_tree.columns = 1
 		preview_tree.set_column_title(0, "错误")

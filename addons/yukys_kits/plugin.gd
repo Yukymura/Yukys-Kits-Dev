@@ -10,18 +10,25 @@ const DataImporterScript := preload("res://addons/yukys_kits/excel_import_tools/
 const DEFAULT_DOCK_NAME := "导表工具"
 const PREVIEW_SCREEN_NAME := "数据预览"
 
-var _dock: Control
-var _preview: Control
+var _dock: Variant
+var _preview: Variant
+var _importer: DataImporterScript
 
-# DataImporter / GameDB 由 project.godot 的 [autoload] 静态注册，插件不再动态增删（静态 autoload）。
-# EditorPlugin 脚本的解析时机早于 autoload，故这里用 /root 节点查找而非裸标识符，
-# 避免「Identifier not declared」解析死锁。
+# GameDB 是运行时 autoload，由 project.godot 静态注册（随游戏导出）。
+# DataImporter 是编辑器专用实例（挂在本插件节点下，而非 autoload），
+# 因此它只存在于编辑器内：不写入 project.godot、不参与导出。
 func _enter_tree() -> void:
+	_importer = DataImporterScript.new()
+	_importer.name = "DataImporter"
+	add_child(_importer)
+
 	_dock = IMPORT_DOCK.instantiate()
 	_dock.name = _get_dock_name()
+	_dock.set_importer(_importer)
 	add_control_to_dock(DOCK_SLOT_LEFT_BL, _dock)
 
 	_preview = DATA_PREVIEW.instantiate()
+	_preview.set_importer(_importer)
 	get_editor_interface().get_editor_main_screen().add_child(_preview)
 	_make_visible(false)
 
@@ -34,24 +41,16 @@ func _exit_tree() -> void:
 		_dock.queue_free()
 	if _preview:
 		_preview.queue_free()
+	if _importer:
+		_importer.queue_free()
 
 func _connect_preview() -> void:
-	var importer: Node = _get_importer()
-	if importer is DataImporterScript:
-		if not importer.preview_requested.is_connected(_on_preview_requested):
-			importer.preview_requested.connect(_on_preview_requested)
+	if _importer and not _importer.preview_requested.is_connected(_on_preview_requested):
+		_importer.preview_requested.connect(_on_preview_requested)
 
 func _disconnect_preview() -> void:
-	var importer: Node = _get_importer()
-	if importer is DataImporterScript:
-		if importer.preview_requested.is_connected(_on_preview_requested):
-			importer.preview_requested.disconnect(_on_preview_requested)
-
-func _get_importer() -> Node:
-	var tree := get_tree()
-	if tree == null:
-		return null
-	return tree.root.get_node_or_null("DataImporter")
+	if _importer and _importer.preview_requested.is_connected(_on_preview_requested):
+		_importer.preview_requested.disconnect(_on_preview_requested)
 
 # ================================================================================
 # 主面板（数据预览）

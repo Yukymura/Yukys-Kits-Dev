@@ -17,8 +17,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
-DataImporter="*res://addons/yukys_kits/excel_import_tools/scene/data_importer.tscn"
-GameDB="*res://addons/yukys_kits/excel_import_tools/scene/game_db.tscn"
+GameDB="*res://addons/yukys_kits/runtime/game_db.tscn"
 
 [display]
 

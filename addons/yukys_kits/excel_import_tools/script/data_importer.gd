@@ -1,10 +1,13 @@
 # ================================================================================
-# DataImporter —— 导表工具（autoload，编辑器可用）
+# DataImporter —— 导表工具（编辑器专用实例，由 plugin.gd 创建并注入 dock/preview）
 #
 # 职责：
 #   - 读取/保存 config.json（导出路径、日志路径）。
 #   - 提供 CSV → JSON 的导表流程。
-#   - 提供运行时加载全部数据的能力（供 GameDB 使用）。
+#   - 提供预览所需的单文件读取 load_data_file()。
+#
+# 注：运行时加载全部数据的能力已移交 GameDB（见 runtime/game_db.gd），
+#     本单例仅供编辑器使用，不参与导出。
 # ================================================================================
 
 @tool
@@ -17,7 +20,7 @@ signal preview_requested(path)
 const CONFIG_PATH := "res://addons/yukys_kits/excel_import_tools/config.json"
 
 const CsvParser := preload("res://addons/yukys_kits/excel_import_tools/tool/csv_parser.gd")
-const JsonData := preload("res://addons/yukys_kits/excel_import_tools/tool/json_data_tool.gd")
+const JsonData := preload("res://addons/yukys_kits/runtime/json_data_tool.gd")
 const Config := preload("res://addons/yukys_kits/excel_import_tools/tool/config_tool.gd")
 const Log := preload("res://addons/yukys_kits/excel_import_tools/tool/logger.gd")
 
@@ -81,9 +84,6 @@ func get_export_path() -> String:
 func set_export_path(path: String) -> void:
 	export_path = path
 	_save_config()
-
-func get_all_data() -> Dictionary:
-	return JsonData.load_all(export_path)
 
 func load_data_file(path: String) -> Dictionary:
 	return JsonData.load_file(path)
