@@ -1,5 +1,4 @@
 {
 	"export_path": "res://data",
-	"log_path": "res://addons/yukys_kits/excel_import_tools/logs/import.log",
-	"dock_name": "导表工具"
+	"log_path": "res://addons/yukys_kits/excel_import_tools/logs/import.log"
 }

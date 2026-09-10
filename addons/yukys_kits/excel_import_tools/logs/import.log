@@ -81,3 +81,9 @@
 [2026-09-10T17:45:27] [INFO] DataImporter 初始化完成，导出路径: res://data
 [2026-09-10T17:47:23] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/特殊方块数据.csv -> res://data/
 [2026-09-10T17:47:23] [DONE] 导表成功: res://data/key_block_data.json（3 行）
+[2026-09-10T17:58:54] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T18:22:00] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T18:36:04] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T18:36:04] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T18:43:35] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T18:43:35] [INFO] DataImporter 初始化完成，导出路径: res://data

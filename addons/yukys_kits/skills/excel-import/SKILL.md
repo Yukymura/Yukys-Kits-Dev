@@ -19,12 +19,12 @@ description: 使用 Yuky's Kits 的导表工具（excel_import_tools）时使用
 | `runtime/game_db.gd` | 运行时 autoload `GameDB`，游戏内取数据 | ✅ |
 | `runtime/json_data_tool.gd` | JSON 读写 + 类型转换（编辑器写 / 运行时读共用） | ✅ |
 | `excel_import_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程 | ❌ |
-| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、导出路径、数据目录、触发导表） | ❌ |
-| `excel_import_tools/script/data_preview.gd` | 主面板「数据预览」，把 JSON 渲染成表格 | ❌ |
+| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、导出路径、触发导表） | ❌ |
+| `excel_import_tools/script/preview_dock.gd` | 主面板「数据预览」（数据库路径、数据树浏览、把 JSON 渲染成表格） | ❌ |
 | `excel_import_tools/tool/csv_parser.gd` | 解析规定格式 CSV | ❌ |
 | `excel_import_tools/tool/config_tool.gd` | 读写 `config.json` | ❌ |
 | `excel_import_tools/tool/logger.gd` | 导表日志 | ❌ |
-| `excel_import_tools/config.json` | 配置：`export_path` / `log_path` / `dock_name` | ❌ |
+| `excel_import_tools/config.json` | 配置：`export_path` / `log_path` / `dock_name` / `panel_names` | ❌ |
 
 ### 导表流程（代码调用链）
 
@@ -184,4 +184,4 @@ if r.ok:
 
 ### 配置项
 
-`config.json` 支持：`export_path`（导出目录，默认 `res://data`）、`log_path`（日志路径）、`dock_name`（Dock 标签名，改后需重载插件）。
+`config.json` 支持：`export_path`（导出目录，默认 `res://data`）、`log_path`（日志路径）、`dock_name`（Dock 标签名，改后需重载插件）、`panel_names`（各子面板 tab 标题，key 为页面节点名）。

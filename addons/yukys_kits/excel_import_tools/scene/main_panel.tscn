@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cjv5ul4gmav50" path="res://addons/yukys_kits/excel_import_tools/script/main_panel.gd" id="1_main_panel"]
 [ext_resource type="PackedScene" uid="uid://dhyad7y5qpd2h" path="res://addons/yukys_kits/excel_import_tools/scene/import_dock.tscn" id="2_1lkc6"]
-[ext_resource type="PackedScene" uid="uid://b3i7fjub440ro" path="res://addons/yukys_kits/excel_import_tools/scene/data_preview.tscn" id="3_hyi6u"]
+[ext_resource type="PackedScene" uid="uid://b3i7fjub440ro" path="res://addons/yukys_kits/excel_import_tools/scene/preview_dock.tscn" id="3_hyi6u"]
 
 [node name="MainPanel" type="Control" unique_id=980205086]
 layout_mode = 3
@@ -29,6 +29,6 @@ visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="DataPreview" parent="Tab" unique_id=1452393099 instance=ExtResource("3_hyi6u")]
+[node name="PreviewDock" parent="Tab" unique_id=1452393099 instance=ExtResource("3_hyi6u")]
 layout_mode = 2
 metadata/_tab_index = 1

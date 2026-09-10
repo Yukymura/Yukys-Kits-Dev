@@ -63,31 +63,9 @@ custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "导表"
 
-[node name="HBox3" type="HBoxContainer" parent="Scroll/VBox" unique_id=2024640537]
-layout_mode = 2
-
-[node name="DataLabel" type="Label" parent="Scroll/VBox/HBox3" unique_id=1373067600]
-layout_mode = 2
-text = "数据库路径"
-
-[node name="DataPathEdit" type="LineEdit" parent="Scroll/VBox/HBox3" unique_id=521525219]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "res://data"
-editable = false
-
-[node name="SelectDataButton" type="Button" parent="Scroll/VBox/HBox3" unique_id=410647780]
-custom_minimum_size = Vector2(64, 32)
-layout_mode = 2
-text = "设置"
-
 [node name="StatusLabel" type="Label" parent="Scroll/VBox" unique_id=981659951]
 layout_mode = 2
 text = "就绪"
-
-[node name="DataTree" type="Tree" parent="Scroll/VBox" unique_id=1331614723]
-layout_mode = 2
-size_flags_vertical = 3
 
 [node name="CsvFileDialog" type="FileDialog" parent="." unique_id=1478308213]
 title = "Open a File"
@@ -96,9 +74,5 @@ access = 2
 filters = PackedStringArray("*.csv ; CSV 表格 (*.csv)")
 
 [node name="OutputDirDialog" type="FileDialog" parent="." unique_id=1205448036]
-title = "Open a Directory"
-file_mode = 2
-
-[node name="DataDirDialog" type="FileDialog" parent="." unique_id=1561104531]
 title = "Open a Directory"
 file_mode = 2

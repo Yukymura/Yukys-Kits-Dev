@@ -3,8 +3,12 @@ extends EditorPlugin
 
 const MAIN_PANEL := preload("res://addons/yukys_kits/excel_import_tools/scene/main_panel.tscn")
 const DataImporterScript := preload("res://addons/yukys_kits/excel_import_tools/script/data_importer.gd")
+const ConfigToolScript := preload("res://addons/yukys_kits/excel_import_tools/tool/config_tool.gd")
 
-const PAGE_PREVIEW := "DataPreview"
+const CONFIG_PATH := "res://addons/yukys_kits/excel_import_tools/config.json"
+const DEFAULT_DOCK_NAME := "导表工具"
+
+const PAGE_PREVIEW := "PreviewDock"
 
 var _main_panel: Variant
 var _importer: DataImporterScript
@@ -20,8 +24,13 @@ func _enter_tree() -> void:
 	_importer.name = "DataImporter"
 	add_child(_importer)
 
+	var config := _load_config()
+
 	_main_panel = MAIN_PANEL.instantiate()
 	_main_panel.set_importer(_importer)
+	# Dock 标签名取自主面板节点名，子面板 tab 标题取自 config.panel_names。
+	_main_panel.name = str(config.get("dock_name", DEFAULT_DOCK_NAME))
+	_main_panel.apply_tab_names(config.get("panel_names", {}))
 	add_control_to_dock(DOCK_SLOT_BOTTOM, _main_panel)
 
 	_connect_preview()
@@ -33,6 +42,12 @@ func _exit_tree() -> void:
 		_main_panel.queue_free()
 	if _importer:
 		_importer.queue_free()
+
+func _load_config() -> Dictionary:
+	var r: Dictionary = ConfigToolScript.load_config(CONFIG_PATH)
+	if not r.get("ok", false):
+		return {}
+	return r.get("data", {})
 
 func _connect_preview() -> void:
 	if _importer and not _importer.preview_requested.is_connected(_on_preview_requested):

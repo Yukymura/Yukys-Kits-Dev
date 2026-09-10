@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://b3i7fjub440ro"]
 
-[ext_resource type="Script" uid="uid://c85vb8irhnhya" path="res://addons/yukys_kits/excel_import_tools/script/data_preview.gd" id="1_data_preview"]
+[ext_resource type="Script" uid="uid://c85vb8irhnhya" path="res://addons/yukys_kits/excel_import_tools/script/preview_dock.gd" id="1_preview_dock"]
 
-[node name="DataPreview" type="Control" unique_id=1452393099]
+[node name="PreviewDock" type="Control" unique_id=1452393099]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,7 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
-script = ExtResource("1_data_preview")
+script = ExtResource("1_preview_dock")
 
 [node name="Scroll" type="ScrollContainer" parent="." unique_id=809373043]
 layout_mode = 1
@@ -37,8 +37,33 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "未选择文件"
 
+[node name="HBox3" type="HBoxContainer" parent="Scroll/VBox" unique_id=2024640537]
+layout_mode = 2
+
+[node name="DataLabel" type="Label" parent="Scroll/VBox/HBox3" unique_id=1373067600]
+layout_mode = 2
+text = "数据库路径"
+
+[node name="DataPathEdit" type="LineEdit" parent="Scroll/VBox/HBox3" unique_id=521525219]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "res://data"
+editable = false
+
+[node name="SelectDataButton" type="Button" parent="Scroll/VBox/HBox3" unique_id=410647780]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "设置"
+
+[node name="DataTree" type="Tree" parent="Scroll/VBox" unique_id=1331614723]
+layout_mode = 2
+
 [node name="PreviewTree" type="Tree" parent="Scroll/VBox" unique_id=133119907]
 layout_mode = 2
 size_flags_vertical = 3
 column_titles_visible = true
 select_mode = 1
+
+[node name="DataDirDialog" type="FileDialog" parent="." unique_id=1561104531]
+title = "Open a Directory"
+file_mode = 2
