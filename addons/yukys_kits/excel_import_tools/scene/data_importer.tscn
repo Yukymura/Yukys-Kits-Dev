@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cavmsuoy6ao3t"]
 
-[ext_resource type="Script" path="res://addons/yukys_kits/excel_import_tools/script/data_importer.gd" id="1_data_importer"]
+[ext_resource type="Script" uid="uid://c7jcak22cg43b" path="res://addons/yukys_kits/excel_import_tools/script/data_importer.gd" id="1_data_importer"]
 
-[node name="DataImporter" type="Node"]
+[node name="DataImporter" type="Node" unique_id=1457477247]
 script = ExtResource("1_data_importer")

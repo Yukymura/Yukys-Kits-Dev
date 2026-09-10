@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://d10qaov5pyitp"]
+
+[ext_resource type="Script" uid="uid://cjv5ul4gmav50" path="res://addons/yukys_kits/excel_import_tools/script/main_panel.gd" id="1_main_panel"]
+[ext_resource type="PackedScene" uid="uid://dhyad7y5qpd2h" path="res://addons/yukys_kits/excel_import_tools/scene/import_dock.tscn" id="2_1lkc6"]
+[ext_resource type="PackedScene" uid="uid://b3i7fjub440ro" path="res://addons/yukys_kits/excel_import_tools/scene/data_preview.tscn" id="3_hyi6u"]
+
+[node name="MainPanel" type="Control" unique_id=980205086]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_panel")
+
+[node name="Tab" type="TabContainer" parent="." unique_id=716220820]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 1
+
+[node name="ImportDock" parent="Tab" unique_id=1370892499 instance=ExtResource("2_1lkc6")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="DataPreview" parent="Tab" unique_id=1452393099 instance=ExtResource("3_hyi6u")]
+layout_mode = 2
+metadata/_tab_index = 1

@@ -1,0 +1,31 @@
+{
+	"data": {
+		"1001": {
+			"color": "red",
+			"material": "metal",
+			"mesh": "cube",
+			"name": "cube_red"
+		},
+		"1002": {
+			"color": "blue",
+			"material": "metal",
+			"mesh": "cube",
+			"name": "cube_blue"
+		},
+		"1003": {
+			"color": "green",
+			"material": "metal",
+			"mesh": "cube",
+			"name": "cube_green"
+		}
+	},
+	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/特殊方块数据.csv",
+	"table_name": "key_block_data",
+	"types": {
+		"color": "String",
+		"material": "String",
+		"mesh": "String",
+		"name": "String"
+	},
+	"update_time": "2026-09-10T17:47:23"
+}

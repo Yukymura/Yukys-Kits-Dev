@@ -5,15 +5,15 @@
 @tool
 extends Control
 
-@onready var csv_path_edit: LineEdit = $VBox/HBox1/CsvPathEdit
-@onready var output_path_edit: LineEdit = $VBox/HBox2/OutputPathEdit
-@onready var data_path_edit: LineEdit = $VBox/HBox3/DataPathEdit
-@onready var status_label: Label = $VBox/StatusLabel
-@onready var data_tree: Tree = $VBox/DataTree
-@onready var select_csv_button: Button = $VBox/HBox1/SelectCsvButton
-@onready var select_output_button: Button = $VBox/HBox2/SelectOutputButton
-@onready var select_data_button: Button = $VBox/HBox3/SelectDataButton
-@onready var import_button: Button = $VBox/ImportButton
+@onready var csv_path_edit: LineEdit = $Scroll/VBox/HBox1/CsvPathEdit
+@onready var output_path_edit: LineEdit = $Scroll/VBox/HBox2/OutputPathEdit
+@onready var data_path_edit: LineEdit = $Scroll/VBox/HBox3/DataPathEdit
+@onready var status_label: Label = $Scroll/VBox/StatusLabel
+@onready var data_tree: Tree = $Scroll/VBox/DataTree
+@onready var select_csv_button: Button = $Scroll/VBox/HBox1/SelectCsvButton
+@onready var select_output_button: Button = $Scroll/VBox/HBox2/SelectOutputButton
+@onready var select_data_button: Button = $Scroll/VBox/HBox3/SelectDataButton
+@onready var import_button: Button = $Scroll/VBox/ImportButton
 @onready var csv_file_dialog: FileDialog = $CsvFileDialog
 @onready var output_dir_dialog: FileDialog = $OutputDirDialog
 @onready var data_dir_dialog: FileDialog = $DataDirDialog
@@ -26,10 +26,14 @@ var _importer: Variant
 
 func set_importer(importer) -> void:
 	_importer = importer
+	if is_node_ready():
+		_connect_importer_signals()
+		_refresh_data_path()
 
 func _ready() -> void:
 	_setup()
 	_connect_signals()
+	_connect_importer_signals()
 	_refresh_data_path()
 
 func _setup() -> void:
@@ -62,10 +66,14 @@ func _connect_signals() -> void:
 	output_dir_dialog.dir_selected.connect(_on_output_selected)
 	data_dir_dialog.dir_selected.connect(_on_data_dir_selected)
 
-	_importer.export_path_changed.connect(_refresh_data_path)
-	_importer.files_changed.connect(_refresh_tree)
-
 	data_tree.item_selected.connect(_on_tree_item_selected)
+
+func _connect_importer_signals() -> void:
+	if _importer == null:
+		return
+	if not _importer.export_path_changed.is_connected(_refresh_data_path):
+		_importer.export_path_changed.connect(_refresh_data_path)
+		_importer.files_changed.connect(_refresh_tree)
 
 # ================================================================================
 # 交互
@@ -100,6 +108,8 @@ func _set_status(text: String, ok: bool) -> void:
 	status_label.modulate = Color(0.4, 0.9, 0.4) if ok else Color(1.0, 0.4, 0.4)
 
 func _refresh_data_path() -> void:
+	if _importer == null:
+		return
 	data_path_edit.text = _importer.get_export_path()
 	_refresh_tree()
 
@@ -148,6 +158,8 @@ func _populate(parent: TreeItem, dir_path: String) -> void:
 # 文件监听（数据目录变更时自动刷新数据树）
 
 func _on_watch_timeout() -> void:
+	if _importer == null:
+		return
 	var path: String = _importer.get_export_path()
 	var sig := _dir_signature(path)
 	if sig != _dir_snapshot:

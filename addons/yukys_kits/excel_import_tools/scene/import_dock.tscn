@@ -12,74 +12,80 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_import_dock")
 
-[node name="VBox" type="VBoxContainer" parent="." unique_id=41700692]
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=1334764160]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+horizontal_scroll_mode = 0
 
-[node name="HBox1" type="HBoxContainer" parent="VBox" unique_id=2080218703]
+[node name="VBox" type="VBoxContainer" parent="Scroll" unique_id=41700692]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBox1" type="HBoxContainer" parent="Scroll/VBox" unique_id=2080218703]
 layout_mode = 2
 
-[node name="CsvLabel" type="Label" parent="VBox/HBox1" unique_id=1397446122]
+[node name="CsvLabel" type="Label" parent="Scroll/VBox/HBox1" unique_id=1397446122]
 layout_mode = 2
 text = "导入文件"
 
-[node name="CsvPathEdit" type="LineEdit" parent="VBox/HBox1" unique_id=1415646575]
+[node name="CsvPathEdit" type="LineEdit" parent="Scroll/VBox/HBox1" unique_id=1415646575]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SelectCsvButton" type="Button" parent="VBox/HBox1" unique_id=1162794081]
+[node name="SelectCsvButton" type="Button" parent="Scroll/VBox/HBox1" unique_id=1162794081]
 custom_minimum_size = Vector2(64, 32)
 layout_mode = 2
 text = "选择"
 
-[node name="HBox2" type="HBoxContainer" parent="VBox" unique_id=1443541098]
+[node name="HBox2" type="HBoxContainer" parent="Scroll/VBox" unique_id=1443541098]
 layout_mode = 2
 
-[node name="OutputLabel" type="Label" parent="VBox/HBox2" unique_id=811515022]
+[node name="OutputLabel" type="Label" parent="Scroll/VBox/HBox2" unique_id=811515022]
 layout_mode = 2
 text = "导出路径"
 
-[node name="OutputPathEdit" type="LineEdit" parent="VBox/HBox2" unique_id=1330922906]
+[node name="OutputPathEdit" type="LineEdit" parent="Scroll/VBox/HBox2" unique_id=1330922906]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SelectOutputButton" type="Button" parent="VBox/HBox2" unique_id=2147237092]
+[node name="SelectOutputButton" type="Button" parent="Scroll/VBox/HBox2" unique_id=2147237092]
 custom_minimum_size = Vector2(64, 32)
 layout_mode = 2
 text = "选择"
 
-[node name="ImportButton" type="Button" parent="VBox" unique_id=1600601650]
+[node name="ImportButton" type="Button" parent="Scroll/VBox" unique_id=1600601650]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "导表"
 
-[node name="HBox3" type="HBoxContainer" parent="VBox" unique_id=2024640537]
+[node name="HBox3" type="HBoxContainer" parent="Scroll/VBox" unique_id=2024640537]
 layout_mode = 2
 
-[node name="DataLabel" type="Label" parent="VBox/HBox3" unique_id=1373067600]
+[node name="DataLabel" type="Label" parent="Scroll/VBox/HBox3" unique_id=1373067600]
 layout_mode = 2
 text = "数据库路径"
 
-[node name="DataPathEdit" type="LineEdit" parent="VBox/HBox3" unique_id=521525219]
+[node name="DataPathEdit" type="LineEdit" parent="Scroll/VBox/HBox3" unique_id=521525219]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "res://data"
 editable = false
 
-[node name="SelectDataButton" type="Button" parent="VBox/HBox3" unique_id=410647780]
+[node name="SelectDataButton" type="Button" parent="Scroll/VBox/HBox3" unique_id=410647780]
 custom_minimum_size = Vector2(64, 32)
 layout_mode = 2
 text = "设置"
 
-[node name="StatusLabel" type="Label" parent="VBox" unique_id=981659951]
+[node name="StatusLabel" type="Label" parent="Scroll/VBox" unique_id=981659951]
 layout_mode = 2
 text = "就绪"
 
-[node name="DataTree" type="Tree" parent="VBox" unique_id=1331614723]
+[node name="DataTree" type="Tree" parent="Scroll/VBox" unique_id=1331614723]
 layout_mode = 2
 size_flags_vertical = 3
 

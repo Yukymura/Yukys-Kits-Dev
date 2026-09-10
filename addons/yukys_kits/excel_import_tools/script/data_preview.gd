@@ -5,8 +5,8 @@
 @tool
 extends Control
 
-@onready var path_label: Label = $VBox/Header/PathLabel
-@onready var preview_tree: Tree = $VBox/PreviewTree
+@onready var path_label: Label = $Scroll/VBox/Header/PathLabel
+@onready var preview_tree: Tree = $Scroll/VBox/PreviewTree
 
 var _importer: Variant
 
@@ -18,6 +18,8 @@ func show_preview(path: String) -> void:
 	_render(path)
 
 func _render(path: String) -> void:
+	if _importer == null:
+		return
 	preview_tree.clear()
 	preview_tree.hide_root = true
 	var r: Dictionary = _importer.load_data_file(path)
@@ -48,7 +50,7 @@ func _render(path: String) -> void:
 	preview_tree.set_column_title(0, "行号")
 	preview_tree.set_column_expand(0, false)
 	preview_tree.set_column_custom_minimum_width(0, 50)
-	preview_tree.set_column_title(1, "id")
+	preview_tree.set_column_title(1, "key")
 	preview_tree.set_column_expand(1, false)
 	preview_tree.set_column_custom_minimum_width(1, 50)
 	for i in fields.size():

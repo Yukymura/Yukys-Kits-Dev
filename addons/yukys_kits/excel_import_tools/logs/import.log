@@ -44,3 +44,40 @@
 [2026-09-09T23:59:06] [INFO] DataImporter 初始化完成，导出路径: res://data
 [2026-09-09T23:59:58] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/方块组数据.csv -> res://data/
 [2026-09-09T23:59:58] [DONE] 导表成功: res://data/tetromino_data.json（16 行）
+[2026-09-10T09:44:17] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T10:00:36] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T10:01:21] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T15:06:52] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T15:42:46] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T15:43:27] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T15:43:57] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T15:50:19] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T15:51:16] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:20:10] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:25:09] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:38:01] [ERROR] 导表失败: 未指定 CSV 文件
+[2026-09-10T16:38:03] [ERROR] 导表失败: 未指定 CSV 文件
+[2026-09-10T16:39:06] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:42:07] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:42:45] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:53:15] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:54:27] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T16:56:16] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:02:54] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:07:01] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:13:26] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:14:13] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:15:49] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:15:55] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:16:30] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:19:16] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:19:52] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:20:37] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:24:59] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:26:24] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:35:43] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:37:14] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:37:15] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:45:27] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-10T17:47:23] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/特殊方块数据.csv -> res://data/
+[2026-09-10T17:47:23] [DONE] 导表成功: res://data/key_block_data.json（3 行）
