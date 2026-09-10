@@ -1,4 +1,9 @@
 {
 	"export_path": "res://data",
-	"log_path": "res://addons/yukys_kits/excel_import_tools/logs/import.log"
+	"log_path": "res://addons/yukys_kits/excel_import_tools/logs/import.log",
+	"dock_name": "导表工具",
+	"panel_names": {
+		"ImportDock": "导表",
+		"PreviewDock": "数据预览"
+	}
 }

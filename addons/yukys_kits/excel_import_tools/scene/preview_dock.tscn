@@ -57,8 +57,11 @@ text = "设置"
 
 [node name="DataTree" type="Tree" parent="Scroll/VBox" unique_id=1331614723]
 layout_mode = 2
+select_mode = 1
+scroll_vertical_enabled = false
 
 [node name="PreviewTree" type="Tree" parent="Scroll/VBox" unique_id=133119907]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 column_titles_visible = true

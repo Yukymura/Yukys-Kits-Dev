@@ -95,7 +95,13 @@ func request_preview(path: String) -> void:
 # 内部
 
 func _save_config() -> void:
-	Config.save_config(CONFIG_PATH, {"export_path": export_path, "log_path": log_path})
+	# 合并写入：先读旧配置，再只更新 export_path/log_path，
+	# 避免覆盖掉 config.json 里的其它字段（dock_name、panel_names 等）。
+	var cfg := Config.load_config(CONFIG_PATH)
+	var data: Dictionary = cfg.data if cfg.ok else {}
+	data["export_path"] = export_path
+	data["log_path"] = log_path
+	Config.save_config(CONFIG_PATH, data)
 
 func _refresh_filesystem(path: String) -> void:
 	files_changed.emit()
