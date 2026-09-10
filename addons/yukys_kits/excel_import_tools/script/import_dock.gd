@@ -77,6 +77,8 @@ func _on_csv_text_submitted(path: String) -> void:
 
 func _on_output_selected(path: String) -> void:
 	output_path_edit.text = path + "/"
+	# 注：程序化设置 .text 不会触发 LineEdit.text_changed，故这里手动刷新状态。
+	_refresh_status()
 
 func _on_output_text_changed(_text: String) -> void:
 	_refresh_status()
