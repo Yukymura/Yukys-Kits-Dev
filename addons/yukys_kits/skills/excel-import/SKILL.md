@@ -18,8 +18,8 @@ description: 使用 Yuky's Kits 的导表工具（excel_import_tools）时使用
 | --- | --- | --- |
 | `runtime/game_db.gd` | 运行时 autoload `GameDB`，游戏内取数据 | ✅ |
 | `runtime/json_data_tool.gd` | JSON 读写 + 类型转换（编辑器写 / 运行时读共用） | ✅ |
-| `excel_import_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程 | ❌ |
-| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、导出路径、触发导表） | ❌ |
+| `excel_import_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程（含 `read_table` / `table_exists`） | ❌ |
+| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、选导出路径、触发导表、预览与重复提醒） | ❌ |
 | `excel_import_tools/script/preview_dock.gd` | 主面板「数据预览」（数据库路径、数据树浏览、把 JSON 渲染成表格） | ❌ |
 | `excel_import_tools/tool/csv_parser.gd` | 解析规定格式 CSV | ❌ |
 | `excel_import_tools/tool/config_tool.gd` | 读写 `config.json` | ❌ |
@@ -41,7 +41,9 @@ import_dock._on_import_pressed()
 ```gdscript
 # DataImporter（编辑器专用实例，不随游戏导出）
 DataImporter.import_csv(csv_path, output_dir) -> { ok, message }
-DataImporter.load_data_file(path)             -> { ok, data:{table_name, data, types} / error }  # 预览用
+DataImporter.read_table(csv_path)             -> { ok, data:{header, keys, types, values} / error }  # 导表面板预览用
+DataImporter.table_exists(output_dir, table_name) -> bool                                            # 是否已有同名 JSON
+DataImporter.load_data_file(path)             -> { ok, data:{table_name, data, types} / error }      # 预览用
 DataImporter.set_export_path(path)
 DataImporter.request_preview(path)            # 触发主面板预览
 

@@ -4,7 +4,7 @@
 # 职责：
 #   - 读取/保存 config.json（导出路径、日志路径）。
 #   - 提供 CSV → JSON 的导表流程。
-#   - 提供预览所需的单文件读取 load_data_file()。
+#   - 提供预览所需的单文件读取 load_data_file() 与 CSV 解析 read_table()。
 #
 # 注：运行时加载全部数据的能力已移交 GameDB（见 runtime/game_db.gd），
 #     本单例仅供编辑器使用，不参与导出。
@@ -87,6 +87,18 @@ func set_export_path(path: String) -> void:
 
 func load_data_file(path: String) -> Dictionary:
 	return JsonData.load_file(path)
+
+# 解析 CSV，返回 { ok, data: { header, keys, types, values } / error }。
+# 供导表面板在选中导入文件后预览单表数据（真实字段名）。
+func read_table(csv_path: String) -> Dictionary:
+	return CsvParser.read_csv(csv_path)
+
+# 导出目录下是否已存在同名 JSON（供导表面板显示「已存在同名 json」提示）。
+func table_exists(output_dir: String, table_name: String) -> bool:
+	if output_dir.is_empty() or table_name.is_empty():
+		return false
+	var p := output_dir.trim_suffix("/").path_join(table_name + ".json")
+	return FileAccess.file_exists(p)
 
 func request_preview(path: String) -> void:
 	preview_requested.emit(path)

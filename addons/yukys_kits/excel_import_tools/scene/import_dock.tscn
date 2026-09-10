@@ -67,6 +67,15 @@ text = "导表"
 layout_mode = 2
 text = "就绪"
 
+[node name="PreviewTree" type="Tree" parent="Scroll/VBox" unique_id=1270750636]
+visible = false
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+size_flags_vertical = 3
+column_titles_visible = true
+hide_root = true
+select_mode = 1
+
 [node name="CsvFileDialog" type="FileDialog" parent="." unique_id=1478308213]
 title = "Open a File"
 file_mode = 0
