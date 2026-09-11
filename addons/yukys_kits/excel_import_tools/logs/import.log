@@ -113,3 +113,10 @@
 [2026-09-10T23:55:39] [DONE] 导表成功: res://test_tables/tetromino_data2.json（16 行）
 [2026-09-11T00:13:46] [INFO] DataImporter 初始化完成，导出路径: res://data
 [2026-09-11T15:55:33] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-11T18:38:31] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-11T18:40:05] [INFO] 开始导表: res://test_tables/方块组数据.csv -> res://data
+[2026-09-11T18:40:05] [DONE] 导表成功: res://data/tetromino_data2.json（16 行）
+[2026-09-11T18:43:37] [INFO] 开始导表: res://test_tables/方块组数据.csv -> res://data
+[2026-09-11T18:43:37] [DONE] 导表成功: res://data/tetromino_data2.json（16 行）
+[2026-09-11T18:44:57] [INFO] 开始导表: res://test_tables/特殊方块数据.csv -> res://data
+[2026-09-11T18:44:57] [DONE] 导表成功: res://data/key_block_data.json（3 行）

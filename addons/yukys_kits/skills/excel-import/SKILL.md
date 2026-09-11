@@ -20,6 +20,7 @@ description: 使用 Yuky's Kits 的导表工具（excel_import_tools）时使用
 | `runtime/json_data_tool.gd` | JSON 读写 + 类型转换（编辑器写 / 运行时读共用） | ✅ |
 | `excel_import_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程（含 `read_table` / `table_exists`） | ❌ |
 | `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、选导出路径、触发导表、预览与重复提醒） | ❌ |
+| `excel_import_tools/script/mcp_export_tool.gd` | 「AI 导表」自定义 MCP 工具处理器（`yukys_export_csv`：切导表页 + 调 `import_csv`） | ❌ |
 | `excel_import_tools/script/preview_dock.gd` | 主面板「数据预览」（数据库路径、数据树浏览、把 JSON 渲染成表格） | ❌ |
 | `excel_import_tools/tool/csv_parser.gd` | 解析规定格式 CSV | ❌ |
 | `excel_import_tools/tool/config_tool.gd` | 读写 `config.json` | ❌ |
@@ -149,6 +150,59 @@ if r.ok:
 ```
 
 运行时读整目录请直接走 `GameDB`（`get_table` / `get_row`），或调用 `JsonData.load_all("res://data")`。
+
+## AI 导表（单表导出）
+
+当用户输入指令 `单表导出xxx` 或 `单表导出 xxx`（xxx 为 CSV 的 `res://` 路径或用户绝对路径）时，AI 助手应切换到导表页并调用现有接口 `DataImporter.import_csv` 完成导出。
+
+> AI 指令的权威清单（触发句式、工具、参数、返回值）见 `ai-commands` skill；本节保留导表实现细节与排查。
+
+### 触发命令
+
+| 指令 | 说明 |
+| --- | --- |
+| `单表导出 res://test_tables/方块组数据.csv` | 导出一个 `res://` CSV |
+| `单表导出 g:\...\方块组数据.csv` | 导出一个用户绝对路径 CSV（自动转 `res://`） |
+
+### 执行方式（自定义 MCP 工具）
+
+插件启用时向 godot_ai 注册了一个自定义 MCP 工具 `yukys_export_csv`（处理器 `excel_import_tools/script/mcp_export_tool.gd`，注册代码在 `plugin.gd`）。它内部做两件事：
+
+1. 切到导表页：`MainPanel.show_page("ImportDock")`。
+2. 调用现有接口：`DataImporter.import_csv(csv_path, output_dir)`。
+
+AI 通过 `custom_manage` 调用该工具：
+
+```
+custom_manage(op="invoke", params={
+    "tool_name": "yukys_export_csv",
+    "params": {"csv_path": "res://test_tables/方块组数据.csv"},
+})
+```
+
+- `csv_path`（必填）：CSV 路径，`res://` 或用户绝对路径均可。
+- `output_dir`（可选）：导出目录；缺省用 `config.json` 的 `export_path`。
+
+返回值（MCP 信封，dispatcher 已解包）：
+
+- 成功 → `{ "ok": true, "message": "导表成功: res://data/xxx.json（N 行）" }`
+- 失败 → `{ "status": "error", "error": { "code": "MISSING_REQUIRED_PARAM"|"INTERNAL_ERROR", "message": "失败原因" } }`
+
+### 路径解析规则
+
+- `res://` / `user://` 开头 → 原样使用。
+- 用户绝对路径（含盘符）→ 若在项目内则转成 `res://`，否则原样传给 `FileAccess`（仍可读）。
+- 导出 JSON 里记录的 `import_path` 即解析后的 CSV 路径。
+
+### 结果与日志
+
+- 导表结果直接看工具返回的 `message`（如「导表成功: res://data/方块组数据.json（N 行）」）。
+- 完整过程/失败原因另见 `logs/import.log`（见下文「导表 log 读取方法」）。
+
+### 排查
+
+- 工具返回「导表工具未就绪」→ 插件未启用，检查 `project.godot` 的 `editor_plugins/enabled` 是否含 `yukys_kits`。
+- `custom_manage(op="list")` 看不到 `yukys_export_csv` → 插件尚未重载；在「项目设置 → 插件」里禁用再启用 yukys_kits（或重启编辑器）。
 
 ## 导表 log 读取方法
 
