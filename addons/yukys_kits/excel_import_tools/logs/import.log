@@ -112,3 +112,4 @@
 [2026-09-10T23:55:39] [INFO] 开始导表: G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/方块组数据.csv -> res://test_tables/
 [2026-09-10T23:55:39] [DONE] 导表成功: res://test_tables/tetromino_data2.json（16 行）
 [2026-09-11T00:13:46] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-11T15:55:33] [INFO] DataImporter 初始化完成，导出路径: res://data

@@ -104,6 +104,9 @@ GameDB.get_row("表名", id)  # {字段:值}
 ### 取数 API
 
 ```gdscript
+# 取所有表名：Array[String]（已排序，供下拉列表等枚举用）
+var names: Array = GameDB.get_table_names()
+
 # 取整张表：{ id: { 字段: 值, ... }, ... }
 var table: Dictionary = GameDB.get_table("ItemTable")
 
