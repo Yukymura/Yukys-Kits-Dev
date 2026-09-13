@@ -17,6 +17,7 @@ signal export_path_changed
 signal files_changed
 signal preview_requested(path)
 signal resource_path_changed
+signal resource_colors_changed
 
 const CONFIG_PATH := "res://addons/yukys_kits/data_tools/config.json"
 
@@ -38,16 +39,37 @@ var resource_path: String = "res://assets":
 		resource_path = v
 		resource_path_changed.emit()
 
+# 资源库分类背景色（图片/音频/Godot 资源），可在「设置」页修改并持久化到 config.json。
+# resource_colors 只存用户改动过的 key -> Color；未设置的 key 回退到 DEFAULT_RESOURCE_COLORS。
+const RESOURCE_COLOR_KEYS: Array = ["image", "audio", "godot"]
+const DEFAULT_RESOURCE_COLORS := {
+	"image": Color(0.27, 0.52, 1.0, 0.25),   # 图片 —— 蓝
+	"audio": Color(0.22, 0.80, 0.45, 0.25),  # 音频 —— 绿
+	"godot": Color(1.0, 0.66, 0.22, 0.25),   # Godot 资源 —— 橙
+}
+
+var resource_colors: Dictionary = {}  # key -> Color
+
+# 配置在 _init() 里同步加载（而非 _ready()）。plugin.gd 在 new() 之后、把 importer
+# 注入 dock 之前就完成了加载，保证 resource_path 等字段立刻是最新值——否则资源库
+# 面板在启动瞬间会先读到字段默认值 "res://assets"，出现「配置是 res://res，显示却
+# 是 res://assets」的竞态。
+func _init() -> void:
+	_load_settings()
+
 func _ready() -> void:
+	_sync_data_dir_setting()
+	Log.set_log_path(log_path)
+	Log.info("DataImporter 初始化完成，导出路径: %s" % export_path)
+
+func _load_settings() -> void:
 	var cfg := Config.load_config(CONFIG_PATH)
 	if cfg.ok:
 		var data: Dictionary = cfg.data
 		export_path = data.get("export_path", JsonData.DEFAULT_DATA_DIR)
 		log_path = data.get("log_path", "")
 		resource_path = data.get("resource_path", "res://assets")
-	_sync_data_dir_setting()
-	Log.set_log_path(log_path)
-	Log.info("DataImporter 初始化完成，导出路径: %s" % export_path)
+		resource_colors = _parse_resource_colors(data.get("resource_colors", {}))
 
 # ================================================================================
 # 导表
@@ -102,6 +124,16 @@ func set_resource_path(path: String) -> void:
 	resource_path = path
 	_save_config()
 
+func get_resource_color(key: String) -> Color:
+	if resource_colors.has(key):
+		return resource_colors[key]
+	return DEFAULT_RESOURCE_COLORS.get(key, Color.WHITE)
+
+func set_resource_color(key: String, color: Color) -> void:
+	resource_colors[key] = color
+	_save_config()
+	resource_colors_changed.emit()
+
 func load_data_file(path: String) -> Dictionary:
 	return JsonData.load_file(path)
 
@@ -140,7 +172,25 @@ func _save_config() -> void:
 	data["export_path"] = export_path
 	data["log_path"] = log_path
 	data["resource_path"] = resource_path
+	data["resource_colors"] = _serialize_resource_colors()
 	Config.save_config(CONFIG_PATH, data)
+
+# config.json 里存十六进制颜色字符串（#rrggbbaa），读入时转回 Color；非法/缺失回退默认色。
+func _parse_resource_colors(raw) -> Dictionary:
+	var out: Dictionary = {}
+	if not raw is Dictionary:
+		return out
+	for key in RESOURCE_COLOR_KEYS:
+		var v = raw.get(key, "")
+		if v is String and not v.is_empty():
+			out[key] = Color.from_string(v, DEFAULT_RESOURCE_COLORS[key])
+	return out
+
+func _serialize_resource_colors() -> Dictionary:
+	var out: Dictionary = {}
+	for key in resource_colors:
+		out[key] = (resource_colors[key] as Color).to_html(true)
+	return out
 
 func _refresh_filesystem(path: String) -> void:
 	files_changed.emit()

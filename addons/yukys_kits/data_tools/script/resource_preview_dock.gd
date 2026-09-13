@@ -2,8 +2,8 @@
 # ResourcePreviewDock —— 资源库预览面板（编辑器）
 #
 # 参照数据预览（PreviewDock）：
-#   - 中部：资源文件树，不同种类资源用不同背景颜色区分：
-#       图片（蓝）/ 音频（绿）/ Godot 资源（橙）。
+#   - 中部：资源文件树，不同种类资源用不同背景颜色区分（配色可在「设置」页配置）：
+#       图片 / 音频 / Godot 资源。
 #   - 点击文件：场景用场景编辑器、脚本用脚本编辑器；图片/音频/Godot 资源用
 #     Inspector 打开（图片/音频显示预览）。
 #   - 文件图标与文件系统 Dock 对齐（按资源类型取编辑器主题图标）。
@@ -18,16 +18,15 @@ const IMAGE_EXTS: Array = ["png", "jpg", "jpeg", "webp", "svg", "bmp", "tga", "e
 const AUDIO_EXTS: Array = ["wav", "ogg", "mp3", "flac", "aac"]
 const GODOT_EXTS: Array = ["tres", "res", "tscn", "gdshader", "gd", "cs"]
 
-const COLOR_IMAGE := Color(0.27, 0.52, 1.0, 0.25)   # 图片 —— 蓝
-const COLOR_AUDIO := Color(0.22, 0.80, 0.45, 0.25)  # 音频 —— 绿
-const COLOR_GODOT := Color(1.0, 0.66, 0.22, 0.25)   # Godot 资源 —— 橙
-
 @onready var path_label: Label = $Scroll/VBox/Header/PathLabel
 @onready var resource_tree: Tree = $Scroll/VBox/ResourceTree
 
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
 var _importer: Variant
+# 图片缩略图（与文件系统 Dock 一致）——异步回调时用代际号避免错位刷新到旧 item。
+var _preview_gen: int = 0
+var _preview_items: Dictionary = {}  # full_path -> TreeItem
 
 func set_importer(importer) -> void:
 	_importer = importer
@@ -56,6 +55,9 @@ func _connect_importer_signals() -> void:
 		return
 	if not _importer.resource_path_changed.is_connected(_refresh_resource_path):
 		_importer.resource_path_changed.connect(_refresh_resource_path)
+	# 配色变化时重建文件树，让新颜色立即生效。
+	if not _importer.resource_colors_changed.is_connected(_refresh_tree):
+		_importer.resource_colors_changed.connect(_refresh_tree)
 
 # ================================================================================
 # 文件树
@@ -72,11 +74,14 @@ func _refresh_tree() -> void:
 
 func _load_tree(path: String) -> void:
 	resource_tree.clear()
+	_preview_gen += 1
+	_preview_items.clear()
 	if path.is_empty():
 		return
 	var root := resource_tree.create_item()
-	var root_name := path.get_file()
-	root.set_text(0, root_name if not root_name.is_empty() else path)
+	# 树根直接显示完整配置路径（如 res://res），与「设置」页 / config.json 的
+	# resource_path 保持一致，避免只显示 basename（"res"）被误读为项目根目录。
+	root.set_text(0, path)
 	_populate(root, path)
 
 func _populate(parent: TreeItem, dir_path: String) -> void:
@@ -101,6 +106,11 @@ func _populate(parent: TreeItem, dir_path: String) -> void:
 				var file_item := resource_tree.create_item(parent)
 				file_item.set_text(0, item)
 				file_item.set_icon(0, _icon_for(full, ext))
+				# 图片：文件系统 Dock 显示的是缩略图而非类型图标，这里同样异步取缩略图。
+				if ext in IMAGE_EXTS:
+					_preview_items[full] = file_item
+					EditorInterface.get_resource_previewer().queue_resource_preview(
+						full, self, "_on_preview_ready", {"gen": _preview_gen})
 				file_item.set_meta("full_path", full)
 				file_item.set_custom_bg_color(0, _color_for(ext))
 		item = dir.get_next()
@@ -113,16 +123,17 @@ func _is_supported(ext: String) -> bool:
 	return ext in IMAGE_EXTS or ext in AUDIO_EXTS or ext in GODOT_EXTS
 
 func _color_for(ext: String) -> Color:
+	# 分类背景色改由 DataImporter 提供（可在「设置」页配置并持久化到 config.json）。
 	if ext in IMAGE_EXTS:
-		return COLOR_IMAGE
+		return _importer.get_resource_color("image")
 	if ext in AUDIO_EXTS:
-		return COLOR_AUDIO
-	return COLOR_GODOT
+		return _importer.get_resource_color("audio")
+	return _importer.get_resource_color("godot")
 
 func _icon_for(full: String, ext: String) -> Texture2D:
 	# 与文件系统 Dock 对齐：按资源类型（get_file_type）取编辑器主题图标。
-	# 具体子类（如 AudioStreamMP3、CompressedTexture2D）通常没有独立图标，
-	# 沿继承链回退到基类图标（AudioStream、Texture2D），与 Godot 自身的 FileSystemDock 一致。
+	# get_file_type 返回具体类型（如 AudioStreamMP3、CompressedTexture2D、Theme）；
+	# 若该类型没有独立图标（如 Resource），沿继承链回退到基类图标，与 FileSystemDock 一致。
 	var type := EditorInterface.get_resource_filesystem().get_file_type(full)
 	if type.is_empty():
 		type = _type_for_ext(ext)
@@ -155,6 +166,17 @@ func _type_for_ext(ext: String) -> String:
 		"tres", "res":
 			return "Resource"
 	return ""
+
+# 图片缩略图异步回调：由 EditorResourcePreview 触发，与文件系统 Dock 共用预览缓存。
+func _on_preview_ready(path: String, _preview: Texture2D, thumbnail: Texture2D, userdata: Variant) -> void:
+	if thumbnail == null:
+		return
+	# 代际校验：树重建后旧回调失效，避免把缩略图写到已清空的旧 item。
+	if int(userdata.get("gen", -1)) != _preview_gen:
+		return
+	var item: TreeItem = _preview_items.get(path)
+	if item != null:
+		item.set_icon(0, thumbnail)
 
 # ================================================================================
 # 文件监听（资源库目录变更时自动刷新文件树）

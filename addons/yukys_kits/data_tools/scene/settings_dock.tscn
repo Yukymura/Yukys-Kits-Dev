@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cbc7amkafvec2"]
 
 [ext_resource type="Script" uid="uid://x6lwrx07m3y3" path="res://addons/yukys_kits/data_tools/script/settings_dock.gd" id="1_settings_dock"]
 
-[node name="SettingsDock" type="Control"]
+[node name="SettingsDock" type="Control" unique_id=421506581]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_settings_dock")
 
-[node name="Scroll" type="ScrollContainer" parent="."]
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=391040593]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,57 +20,100 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="VBox" type="VBoxContainer" parent="Scroll"]
+[node name="VBox" type="VBoxContainer" parent="Scroll" unique_id=1747567076]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="DataHeader" type="Label" parent="Scroll/VBox"]
+[node name="DataHeader" type="Label" parent="Scroll/VBox" unique_id=1122455633]
 layout_mode = 2
 text = "数据"
 
-[node name="DataSection" type="HBoxContainer" parent="Scroll/VBox"]
+[node name="DataSection" type="HBoxContainer" parent="Scroll/VBox" unique_id=421918398]
 layout_mode = 2
 
-[node name="DBLabel" type="Label" parent="Scroll/VBox/DataSection"]
+[node name="DBLabel" type="Label" parent="Scroll/VBox/DataSection" unique_id=84053800]
 layout_mode = 2
 text = "数据库路径"
 
-[node name="DBPathEdit" type="LineEdit" parent="Scroll/VBox/DataSection"]
+[node name="DBPathEdit" type="LineEdit" parent="Scroll/VBox/DataSection" unique_id=1481960311]
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="SelectDBButton" type="Button" parent="Scroll/VBox/DataSection"]
+[node name="SelectDBButton" type="Button" parent="Scroll/VBox/DataSection" unique_id=1195008191]
 custom_minimum_size = Vector2(64, 32)
 layout_mode = 2
 text = "设置"
 
-[node name="ResourceHeader" type="Label" parent="Scroll/VBox"]
+[node name="ResourceHeader" type="Label" parent="Scroll/VBox" unique_id=1663914580]
 layout_mode = 2
 text = "资源库"
 
-[node name="ResourceSection" type="HBoxContainer" parent="Scroll/VBox"]
+[node name="ResourceSection" type="HBoxContainer" parent="Scroll/VBox" unique_id=1917717648]
 layout_mode = 2
 
-[node name="ResourceLabel" type="Label" parent="Scroll/VBox/ResourceSection"]
+[node name="ResourceLabel" type="Label" parent="Scroll/VBox/ResourceSection" unique_id=974421860]
 layout_mode = 2
 text = "资源库路径"
 
-[node name="ResourcePathEdit" type="LineEdit" parent="Scroll/VBox/ResourceSection"]
+[node name="ResourcePathEdit" type="LineEdit" parent="Scroll/VBox/ResourceSection" unique_id=342440068]
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="SelectResourceButton" type="Button" parent="Scroll/VBox/ResourceSection"]
+[node name="SelectResourceButton" type="Button" parent="Scroll/VBox/ResourceSection" unique_id=1754481904]
 custom_minimum_size = Vector2(64, 32)
 layout_mode = 2
 text = "设置"
 
-[node name="DBDirDialog" type="FileDialog" parent="."]
+[node name="ResourceColorsLabel" type="Label" parent="Scroll/VBox" unique_id=1473544530]
+layout_mode = 2
+text = "背景配色"
+
+[node name="ImageColorRow" type="HBoxContainer" parent="Scroll/VBox" unique_id=1905511865]
+layout_mode = 2
+
+[node name="ImageColorLabel" type="Label" parent="Scroll/VBox/ImageColorRow" unique_id=273558357]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "图片背景色"
+
+[node name="ImageColorPicker" type="ColorPickerButton" parent="Scroll/VBox/ImageColorRow" unique_id=1304006504]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.27, 0.52, 1, 0.25)
+
+[node name="AudioColorRow" type="HBoxContainer" parent="Scroll/VBox" unique_id=774642094]
+layout_mode = 2
+
+[node name="AudioColorLabel" type="Label" parent="Scroll/VBox/AudioColorRow" unique_id=1390806491]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "音频背景色"
+
+[node name="AudioColorPicker" type="ColorPickerButton" parent="Scroll/VBox/AudioColorRow" unique_id=104583467]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.22, 0.8, 0.45, 0.25)
+
+[node name="GodotColorRow" type="HBoxContainer" parent="Scroll/VBox" unique_id=1429244845]
+layout_mode = 2
+
+[node name="GodotColorLabel" type="Label" parent="Scroll/VBox/GodotColorRow" unique_id=1055741222]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Godot 资源背景色"
+
+[node name="GodotColorPicker" type="ColorPickerButton" parent="Scroll/VBox/GodotColorRow" unique_id=920146677]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(1, 0.66, 0.22, 0.25)
+
+[node name="DBDirDialog" type="FileDialog" parent="." unique_id=1749989685]
 title = "Open a Directory"
 file_mode = 2
 
-[node name="ResourceDirDialog" type="FileDialog" parent="."]
+[node name="ResourceDirDialog" type="FileDialog" parent="." unique_id=1667384430]
 title = "Open a Directory"
 file_mode = 2
