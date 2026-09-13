@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://d4kn1rawv6fj"]
+
+[ext_resource type="Script" uid="uid://csfcet2ty3cr7" path="res://addons/yukys_kits/excel_import_tools/script/resource_preview_dock.gd" id="1_resource_preview_dock"]
+
+[node name="ResourcePreviewDock" type="Control" unique_id=-979553395]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("1_resource_preview_dock")
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=-755341571]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Scroll" unique_id=-356940541]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Header" type="HBoxContainer" parent="Scroll/VBox" unique_id=-1192705562]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Scroll/VBox/Header" unique_id=-1248566088]
+layout_mode = 2
+text = "资源预览"
+
+[node name="PathLabel" type="Label" parent="Scroll/VBox/Header" unique_id=-799605573]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "未选择文件"
+
+[node name="HBox3" type="HBoxContainer" parent="Scroll/VBox" unique_id=-1122099395]
+layout_mode = 2
+
+[node name="ResLabel" type="Label" parent="Scroll/VBox/HBox3" unique_id=-361139585]
+layout_mode = 2
+text = "资源库路径"
+
+[node name="ResourcePathEdit" type="LineEdit" parent="Scroll/VBox/HBox3" unique_id=-1065287687]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "res://assets"
+editable = false
+
+[node name="SelectResourceButton" type="Button" parent="Scroll/VBox/HBox3" unique_id=-625540833]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "设置"
+
+[node name="ResourceTree" type="Tree" parent="Scroll/VBox" unique_id=-920071411]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+select_mode = 1
+
+[node name="ResourceDirDialog" type="FileDialog" parent="." unique_id=-1027233108]
+title = "Open a Directory"
+file_mode = 2

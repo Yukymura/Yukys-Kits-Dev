@@ -120,3 +120,12 @@
 [2026-09-11T18:43:37] [DONE] 导表成功: res://data/tetromino_data2.json（16 行）
 [2026-09-11T18:44:57] [INFO] 开始导表: res://test_tables/特殊方块数据.csv -> res://data
 [2026-09-11T18:44:57] [DONE] 导表成功: res://data/key_block_data.json（3 行）
+[2026-09-12T23:02:33] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-12T23:38:55] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-12T23:39:01] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-12T23:39:50] [INFO] DataImporter 初始化完成，导出路径: res://test_tables
+[2026-09-13T09:54:54] [INFO] DataImporter 初始化完成，导出路径: res://test_tables
+[2026-09-13T10:04:10] [INFO] DataImporter 初始化完成，导出路径: res://test_tables
+[2026-09-13T10:06:17] [INFO] DataImporter 初始化完成，导出路径: res://test_tables
+[2026-09-13T10:10:54] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-13T10:52:51] [INFO] DataImporter 初始化完成，导出路径: res://data

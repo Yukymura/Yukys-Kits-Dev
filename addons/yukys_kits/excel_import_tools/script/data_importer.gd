@@ -16,6 +16,7 @@ extends Node
 signal export_path_changed
 signal files_changed
 signal preview_requested(path)
+signal resource_path_changed
 
 const CONFIG_PATH := "res://addons/yukys_kits/excel_import_tools/config.json"
 
@@ -31,12 +32,20 @@ var export_path: String = "res://data":
 
 var log_path: String = ""
 
+# 资源库目录（编辑器专用，供 ResourcePreviewDock 浏览图片/音频/Godot 资源）。
+var resource_path: String = "res://assets":
+	set(v):
+		resource_path = v
+		resource_path_changed.emit()
+
 func _ready() -> void:
 	var cfg := Config.load_config(CONFIG_PATH)
 	if cfg.ok:
 		var data: Dictionary = cfg.data
-		export_path = data.get("export_path", "res://data")
+		export_path = data.get("export_path", JsonData.DEFAULT_DATA_DIR)
 		log_path = data.get("log_path", "")
+		resource_path = data.get("resource_path", "res://assets")
+	_sync_data_dir_setting()
 	Log.set_log_path(log_path)
 	Log.info("DataImporter 初始化完成，导出路径: %s" % export_path)
 
@@ -84,6 +93,14 @@ func get_export_path() -> String:
 func set_export_path(path: String) -> void:
 	export_path = path
 	_save_config()
+	_sync_data_dir_setting()
+
+func get_resource_path() -> String:
+	return resource_path
+
+func set_resource_path(path: String) -> void:
+	resource_path = path
+	_save_config()
 
 func load_data_file(path: String) -> Dictionary:
 	return JsonData.load_file(path)
@@ -106,6 +123,15 @@ func request_preview(path: String) -> void:
 # ================================================================================
 # 内部
 
+# 把导出路径同步到 ProjectSettings（键 JsonData.SETTING_DATA_DIR），供运行时 GameDB 读取。
+# 值变化时才写，并落盘 project.godot，保证导出后的游戏也能读到同一路径。
+func _sync_data_dir_setting() -> void:
+	if ProjectSettings.get_setting(JsonData.SETTING_DATA_DIR, "") == export_path:
+		return
+	ProjectSettings.set_setting(JsonData.SETTING_DATA_DIR, export_path)
+	if Engine.is_editor_hint():
+		ProjectSettings.save()
+
 func _save_config() -> void:
 	# 合并写入：先读旧配置，再只更新 export_path/log_path，
 	# 避免覆盖掉 config.json 里的其它字段（dock_name、panel_names 等）。
@@ -113,6 +139,7 @@ func _save_config() -> void:
 	var data: Dictionary = cfg.data if cfg.ok else {}
 	data["export_path"] = export_path
 	data["log_path"] = log_path
+	data["resource_path"] = resource_path
 	Config.save_config(CONFIG_PATH, data)
 
 func _refresh_filesystem(path: String) -> void:

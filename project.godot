@@ -8,6 +8,10 @@
 
 config_version=5
 
+[addons]
+
+yukys_kits/data_dir="res://data"
+
 [application]
 
 config/name="Yukys-Kits-Dev"

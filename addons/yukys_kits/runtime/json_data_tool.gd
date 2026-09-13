@@ -17,6 +17,12 @@
 @tool
 extends RefCounted
 
+# 数据库目录（导出/读取 JSON 的目录）的 ProjectSettings 键与默认值。
+# 编辑器侧（DataImporter / plugin.gd）写入，运行时侧（GameDB）经此键读取，
+# 让运行时不再写死 res://data，而是跟随用户配置的导出路径。
+const SETTING_DATA_DIR := "addons/yukys_kits/data_dir"
+const DEFAULT_DATA_DIR := "res://data"
+
 # ================================================================================
 # 写
 

@@ -6,6 +6,7 @@ const DataImporterScript := preload("res://addons/yukys_kits/excel_import_tools/
 const ConfigToolScript := preload("res://addons/yukys_kits/excel_import_tools/tool/config_tool.gd")
 const McpCustomToolSpec := preload("res://addons/godot_ai/custom_tools/mcp_custom_tool_spec.gd")
 const McpToolRegistry := preload("res://addons/godot_ai/custom_tools/mcp_tool_registry.gd")
+const JsonData := preload("res://addons/yukys_kits/runtime/json_data_tool.gd")
 
 const CONFIG_PATH := "res://addons/yukys_kits/excel_import_tools/config.json"
 const DEFAULT_DOCK_NAME := "导表工具"
@@ -37,6 +38,8 @@ static func get_main_panel() -> Variant:
 # 导表/预览页面已在 main_panel.tscn 中实例化（TabContainer 的两个 tab），
 # 整个主面板用标准方式挂载为编辑器 Dock。
 func _enter_tree() -> void:
+	_register_project_settings()
+
 	_importer = DataImporterScript.new()
 	_importer.name = "DataImporter"
 	add_child(_importer)
@@ -65,6 +68,19 @@ func _exit_tree() -> void:
 		_importer.queue_free()
 	_importer_ref = null
 	_main_panel_ref = null
+
+# 注册 ProjectSettings 键：数据库目录。编辑器侧 DataImporter 写入、运行时 GameDB 读取，
+# 使 GameDB 不必写死 res://data。仅在键不存在时注册（避免覆盖用户已改的值）。
+func _register_project_settings() -> void:
+	if ProjectSettings.has_setting(JsonData.SETTING_DATA_DIR):
+		return
+	ProjectSettings.set_setting(JsonData.SETTING_DATA_DIR, JsonData.DEFAULT_DATA_DIR)
+	ProjectSettings.add_property_info({
+		"name": JsonData.SETTING_DATA_DIR,
+		"type": TYPE_STRING,
+		"hint": PROPERTY_HINT_DIR,
+		"hint_string": "res://",
+	})
 
 func _load_config() -> Dictionary:
 	var r: Dictionary = ConfigToolScript.load_config(CONFIG_PATH)

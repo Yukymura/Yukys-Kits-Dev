@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cxaqic86ehx6j"]
 
-[ext_resource type="Script" path="res://test/test_scene.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dn5ox3s0e4thc" path="res://test/test_scene.gd" id="1_script"]
 
-[node name="TestScene" type="Control"]
+[node name="TestScene" type="Control" unique_id=1235000482]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=1181264772]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,49 +23,47 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1018628364]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Margin/VBox"]
+[node name="Title" type="Label" parent="Margin/VBox" unique_id=390883442]
 layout_mode = 2
 text = "导表数据测试场景（GameDB 只读访问）"
 
-[node name="TableRow" type="HBoxContainer" parent="Margin/VBox"]
+[node name="TableRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1172290383]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TableLabel" type="Label" parent="Margin/VBox/TableRow"]
+[node name="TableLabel" type="Label" parent="Margin/VBox/TableRow" unique_id=1085109624]
 layout_mode = 2
 text = "数据表："
 
-[node name="TableSelector" type="OptionButton" parent="Margin/VBox/TableRow"]
+[node name="TableSelector" type="OptionButton" parent="Margin/VBox/TableRow" unique_id=87431446]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SearchRow" type="HBoxContainer" parent="Margin/VBox"]
+[node name="SearchRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1702550002]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SearchLabel" type="Label" parent="Margin/VBox/SearchRow"]
+[node name="SearchLabel" type="Label" parent="Margin/VBox/SearchRow" unique_id=127625127]
 layout_mode = 2
 text = "搜索 key："
 
-[node name="SearchBox" type="LineEdit" parent="Margin/VBox/SearchRow"]
+[node name="SearchBox" type="LineEdit" parent="Margin/VBox/SearchRow" unique_id=1309736110]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "输入 key 后仅显示匹配的数据行"
 
-[node name="ClearButton" type="Button" parent="Margin/VBox/SearchRow"]
+[node name="ClearButton" type="Button" parent="Margin/VBox/SearchRow" unique_id=708161987]
 layout_mode = 2
 text = "清除"
 
-[node name="StatusLabel" type="Label" parent="Margin/VBox"]
+[node name="StatusLabel" type="Label" parent="Margin/VBox" unique_id=199991439]
 layout_mode = 2
-text = ""
 
-[node name="DataTree" type="Tree" parent="Margin/VBox"]
+[node name="DataTree" type="Tree" parent="Margin/VBox" unique_id=1353183048]
 layout_mode = 2
 size_flags_vertical = 3
-columns = 1
 hide_root = true

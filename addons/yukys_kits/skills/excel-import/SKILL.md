@@ -100,7 +100,7 @@ GameDB.get_row("表名", id)  # {字段:值}
 
 - `GameDB` 是 `project.godot` 里的静态 autoload，游戏运行时直接按名称访问。
 - `DataImporter` 是编辑器专用实例（由 plugin.gd 创建并注入 dock/preview），**不随游戏导出**，运行时不可用。
-- `GameDB._ready()` 会在启动时通过 `JsonData.load_all(DATA_DIR)` 一次性把 `res://data` 下所有 JSON 载入内存（`DATA_DIR` 是 `game_db.gd` 里的常量，需与编辑器 `export_path` 默认值一致）。
+- `GameDB._ready()` 会在启动时从 ProjectSettings（键 `addons/yukys_kits/data_dir`，缺省 `res://data`）读取数据库路径，再 `JsonData.load_all()` 载入该目录下所有 JSON。该键由编辑器侧 `DataImporter` 在用户设置导出路径时同步写入，故运行时跟随用户配置、不写死。
 
 ### 取数 API
 
