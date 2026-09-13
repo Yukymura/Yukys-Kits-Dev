@@ -1,0 +1,76 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://x6lwrx07m3y3" path="res://addons/yukys_kits/data_tools/script/settings_dock.gd" id="1_settings_dock"]
+
+[node name="SettingsDock" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings_dock")
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DataHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+text = "数据"
+
+[node name="DataSection" type="HBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+
+[node name="DBLabel" type="Label" parent="Scroll/VBox/DataSection"]
+layout_mode = 2
+text = "数据库路径"
+
+[node name="DBPathEdit" type="LineEdit" parent="Scroll/VBox/DataSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="SelectDBButton" type="Button" parent="Scroll/VBox/DataSection"]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "设置"
+
+[node name="ResourceHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+text = "资源库"
+
+[node name="ResourceSection" type="HBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+
+[node name="ResourceLabel" type="Label" parent="Scroll/VBox/ResourceSection"]
+layout_mode = 2
+text = "资源库路径"
+
+[node name="ResourcePathEdit" type="LineEdit" parent="Scroll/VBox/ResourceSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="SelectResourceButton" type="Button" parent="Scroll/VBox/ResourceSection"]
+custom_minimum_size = Vector2(64, 32)
+layout_mode = 2
+text = "设置"
+
+[node name="DBDirDialog" type="FileDialog" parent="."]
+title = "Open a Directory"
+file_mode = 2
+
+[node name="ResourceDirDialog" type="FileDialog" parent="."]
+title = "Open a Directory"
+file_mode = 2

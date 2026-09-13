@@ -1,6 +1,6 @@
 # ================================================================================
 # PreviewDock —— JSON 数据可视化预览（编辑器主面板，只读；含行号、字段名列表头）
-# 同时承担「数据库路径」设置与「数据树」浏览（点击数据树 JSON → 预览）。
+# 承担「数据树」浏览（点击数据树 JSON → 预览）；数据库路径在「设置」页配置。
 # ================================================================================
 
 @tool
@@ -8,10 +8,7 @@ extends Control
 
 @onready var path_label: Label = $Scroll/VBox/Header/PathLabel
 @onready var preview_tree: Tree = $Scroll/VBox/PreviewTree
-@onready var data_path_edit: LineEdit = $Scroll/VBox/HBox3/DataPathEdit
 @onready var data_tree: Tree = $Scroll/VBox/DataTree
-@onready var select_data_button: Button = $Scroll/VBox/HBox3/SelectDataButton
-@onready var data_dir_dialog: FileDialog = $DataDirDialog
 
 const TREE_ALLOWED_EXTENSIONS: Array = ["json"]
 
@@ -33,10 +30,6 @@ func _ready() -> void:
 
 func _setup() -> void:
 	preview_tree.visible = false
-	data_path_edit.editable = false
-
-	data_dir_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
-	data_dir_dialog.access = FileDialog.ACCESS_RESOURCES
 
 	_watch_timer = Timer.new()
 	_watch_timer.wait_time = 1.0
@@ -45,8 +38,6 @@ func _setup() -> void:
 	add_child(_watch_timer)
 
 func _connect_signals() -> void:
-	select_data_button.pressed.connect(_on_select_data_pressed)
-	data_dir_dialog.dir_selected.connect(_on_data_dir_selected)
 	data_tree.item_selected.connect(_on_tree_item_selected)
 
 func _connect_importer_signals() -> void:
@@ -128,18 +119,11 @@ func _value_to_text(value) -> String:
 	return str(value)
 
 # ================================================================================
-# 数据库路径 + 数据树
-
-func _on_select_data_pressed() -> void:
-	data_dir_dialog.popup_centered_ratio(0.6)
-
-func _on_data_dir_selected(path: String) -> void:
-	_importer.set_export_path(path)
+# 数据树
 
 func _refresh_data_path() -> void:
 	if _importer == null:
 		return
-	data_path_edit.text = _importer.get_export_path()
 	_refresh_tree()
 
 func _refresh_tree() -> void:

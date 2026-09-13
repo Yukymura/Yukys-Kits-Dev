@@ -1,14 +1,14 @@
 ---
 name: excel-import
-description: 使用 Yuky's Kits 的导表工具（excel_import_tools）时使用——包括理解/编写规定格式的 CSV、走 CSV→JSON 导表流程、按需扩展导表代码、游戏内调取导表数据，以及读取导表日志排查问题。
+description: 使用 Yuky's Kits 的导表工具（data_tools）时使用——包括理解/编写规定格式的 CSV、走 CSV→JSON 导表流程、按需扩展导表代码、游戏内调取导表数据，以及读取导表日志排查问题。
 ---
 
-# 导表（excel_import_tools）
+# 导表（data_tools）
 
 把「规定格式」的 CSV 表格导出为 JSON 数据文件，并在游戏内通过 `GameDB` 访问。
 插件根目录：`addons/yukys_kits/`。
 - `runtime/` —— 游戏代码（随游戏导出）。
-- `excel_import_tools/` —— 编辑器工具代码（导出时排除）。
+- `data_tools/` —— 编辑器工具代码（导出时排除）。
 
 ## 导表相关代码指引
 
@@ -18,14 +18,14 @@ description: 使用 Yuky's Kits 的导表工具（excel_import_tools）时使用
 | --- | --- | --- |
 | `runtime/game_db.gd` | 运行时 autoload `GameDB`，游戏内取数据 | ✅ |
 | `runtime/json_data_tool.gd` | JSON 读写 + 类型转换（编辑器写 / 运行时读共用） | ✅ |
-| `excel_import_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程（含 `read_table` / `table_exists`） | ❌ |
-| `excel_import_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、选导出路径、触发导表、预览与重复提醒） | ❌ |
-| `excel_import_tools/script/mcp_export_tool.gd` | 「AI 导表」自定义 MCP 工具处理器（`yukys_export_csv`：切导表页 + 调 `import_csv`） | ❌ |
-| `excel_import_tools/script/preview_dock.gd` | 主面板「数据预览」（数据库路径、数据树浏览、把 JSON 渲染成表格） | ❌ |
-| `excel_import_tools/tool/csv_parser.gd` | 解析规定格式 CSV | ❌ |
-| `excel_import_tools/tool/config_tool.gd` | 读写 `config.json` | ❌ |
-| `excel_import_tools/tool/logger.gd` | 导表日志 | ❌ |
-| `excel_import_tools/config.json` | 配置：`export_path` / `log_path` / `dock_name` / `panel_names` | ❌ |
+| `data_tools/script/data_importer.gd` | 编辑器专用实例 `DataImporter`（plugin.gd 创建并注入），串起导表流程（含 `read_table` / `table_exists`） | ❌ |
+| `data_tools/script/import_dock.gd` | 编辑器 Dock 面板（选 CSV、选导出路径、触发导表、预览与重复提醒） | ❌ |
+| `data_tools/script/mcp_export_tool.gd` | 「AI 导表」自定义 MCP 工具处理器（`yukys_export_csv`：切导表页 + 调 `import_csv`） | ❌ |
+| `data_tools/script/preview_dock.gd` | 主面板「数据预览」（数据库路径、数据树浏览、把 JSON 渲染成表格） | ❌ |
+| `data_tools/tool/csv_parser.gd` | 解析规定格式 CSV | ❌ |
+| `data_tools/tool/config_tool.gd` | 读写 `config.json` | ❌ |
+| `data_tools/tool/logger.gd` | 导表日志 | ❌ |
+| `data_tools/config.json` | 配置：`export_path` / `log_path` / `dock_name` / `panel_names` | ❌ |
 
 ### 导表流程（代码调用链）
 
@@ -166,7 +166,7 @@ if r.ok:
 
 ### 执行方式（自定义 MCP 工具）
 
-插件启用时向 godot_ai 注册了一个自定义 MCP 工具 `yukys_export_csv`（处理器 `excel_import_tools/script/mcp_export_tool.gd`，注册代码在 `plugin.gd`）。它内部做两件事：
+插件启用时向 godot_ai 注册了一个自定义 MCP 工具 `yukys_export_csv`（处理器 `data_tools/script/mcp_export_tool.gd`，注册代码在 `plugin.gd`）。它内部做两件事：
 
 1. 切到导表页：`MainPanel.show_page("ImportDock")`。
 2. 调用现有接口：`DataImporter.import_csv(csv_path, output_dir)`。
@@ -208,8 +208,8 @@ custom_manage(op="invoke", params={
 
 ### 日志位置
 
-- 默认路径：`addons/yukys_kits/excel_import_tools/logs/import.log`
-- 可在 `excel_import_tools/config.json` 的 `log_path` 项覆盖。
+- 默认路径：`addons/yukys_kits/data_tools/logs/import.log`
+- 可在 `data_tools/config.json` 的 `log_path` 项覆盖。
 
 ### 输出规则
 

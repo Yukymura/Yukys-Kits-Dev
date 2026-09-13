@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dhyad7y5qpd2h"]
 
-[ext_resource type="Script" uid="uid://wd20spy1j1b7" path="res://addons/yukys_kits/excel_import_tools/script/import_dock.gd" id="1_import_dock"]
+[ext_resource type="Script" uid="uid://wd20spy1j1b7" path="res://addons/yukys_kits/data_tools/script/import_dock.gd" id="1_m6y72"]
 
 [node name="ImportDock" type="Control" unique_id=1370892499]
 custom_minimum_size = Vector2(336, 0)
@@ -10,7 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_import_dock")
+script = ExtResource("1_m6y72")
 
 [node name="Scroll" type="ScrollContainer" parent="." unique_id=1334764160]
 layout_mode = 1

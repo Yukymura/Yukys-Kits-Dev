@@ -18,12 +18,12 @@ signal files_changed
 signal preview_requested(path)
 signal resource_path_changed
 
-const CONFIG_PATH := "res://addons/yukys_kits/excel_import_tools/config.json"
+const CONFIG_PATH := "res://addons/yukys_kits/data_tools/config.json"
 
-const CsvParser := preload("res://addons/yukys_kits/excel_import_tools/tool/csv_parser.gd")
+const CsvParser := preload("res://addons/yukys_kits/data_tools/tool/csv_parser.gd")
 const JsonData := preload("res://addons/yukys_kits/runtime/json_data_tool.gd")
-const Config := preload("res://addons/yukys_kits/excel_import_tools/tool/config_tool.gd")
-const Log := preload("res://addons/yukys_kits/excel_import_tools/tool/logger.gd")
+const Config := preload("res://addons/yukys_kits/data_tools/tool/config_tool.gd")
+const Log := preload("res://addons/yukys_kits/data_tools/tool/logger.gd")
 
 var export_path: String = "res://data":
 	set(v):

@@ -10,7 +10,7 @@ description: 使用 AI 开发 Yuky's Kits 插件（Godot 4.7）时的开发流�
 ## 项目概览
 
 - **插件名**：Yuky'sKits（`addons/yukys_kits/`），Godot 4.7。
-- **首个功能**：导表工具（excel_import_tools）——把「规定格式」CSV 导出为 JSON，游戏内通过 autoload `GameDB` 访问。
+- **首个功能**：导表工具（data_tools）——把「规定格式」CSV 导出为 JSON，游戏内通过 autoload `GameDB` 访问。
 - **需求来源**：`addons/yukys_kits/原始需求`（自然语言需求）+ `addons/yukys_kits/需求文档.md`（结构化跟踪，FEAT-ID + 状态图例 ✅/🚧/🔲…）。
 
 ## 目录结构与代码边界（最重要）
@@ -18,7 +18,7 @@ description: 使用 AI 开发 Yuky's Kits 插件（Godot 4.7）时的开发流�
 | 路径 | 作用 | 随游戏导出 |
 | --- | --- | --- |
 | `runtime/` | 游戏运行时代码（`game_db.gd` autoload、`json_data_tool.gd`） | ✅ |
-| `excel_import_tools/` | 编辑器工具代码（`data_importer`、`import_dock`、`preview_dock`、`tool/` 下的 parser/config/logger） | ❌ |
+| `data_tools/` | 编辑器工具代码（`data_importer`、`import_dock`、`preview_dock`、`tool/` 下的 parser/config/logger） | ❌ |
 | `plugin.gd` | 插件入口（EditorPlugin，`_enter_tree`/`_exit_tree`） | ❌ |
 | `skills/` | 本插件附带的 skill 文档 | 文档 |
 | `test/` | **测试场景（游戏目录，非插件目录）** | ✅ |
@@ -34,12 +34,12 @@ description: 使用 AI 开发 Yuky's Kits 插件（Godot 4.7）时的开发流�
    - ✅ 可用：`GameDB`（`get_table_names()` / `get_table()` / `get_row()`）。
    - ❌ 禁用：`JsonData`、`DataImporter`、`CsvParser`、`ConfigTool`、`Logger` 等内部类。
    - 测试场景缺什么公开能力，就在 `game_db.gd`（运行时）里**新增公开方法**，而不是让测试场景去 `preload` 内部脚本。
-3. **「AI 导表」通过 godot_ai 自定义 MCP 工具桥接**：插件 `_enter_tree` 向 `McpToolRegistry` 注册 `yukys_export_csv`（处理器 `excel_import_tools/script/mcp_export_tool.gd`，经 `plugin.gd` 的静态访问器拿 importer/主面板）。所有 AI 指令的权威清单在 `skills/ai-commands/SKILL.md`；改导表或页面切换逻辑时，记得同步该工具、`ai-commands` 指令清单与 `skills/excel-import/SKILL.md` 的「AI 导表」章节。
+3. **「AI 导表」通过 godot_ai 自定义 MCP 工具桥接**：插件 `_enter_tree` 向 `McpToolRegistry` 注册 `yukys_export_csv`（处理器 `data_tools/script/mcp_export_tool.gd`，经 `plugin.gd` 的静态访问器拿 importer/主面板）。所有 AI 指令的权威清单在 `skills/ai-commands/SKILL.md`；改导表或页面切换逻辑时，记得同步该工具、`ai-commands` 指令清单与 `skills/excel-import/SKILL.md` 的「AI 导表」章节。
 
 ## 标准开发流程
 
 1. **读需求**：先读 `原始需求` 对应条目 + `需求文档.md` 对应 FEAT，明确验收标准。
-2. **定位改动目录**：编辑器功能 → `excel_import_tools/`；游戏内能力 → `runtime/`；测试/验证 → `test/`。
+2. **定位改动目录**：编辑器功能 → `data_tools/`；游戏内能力 → `runtime/`；测试/验证 → `test/`。
 3. **实现**：遵循现有代码风格（见下「代码规范」）；如需新公开接口，加到 `GameDB` 并在对应 `skills/*/SKILL.md` 里文档化。
 4. **更新需求跟踪**：改完在 `需求文档.md` 补「功能点清单」勾选 + 「状态更新记录」一行；`原始需求` 条目后加「(已实现)」。
 5. **验证**：走「验证方法」流程，用 Godot MCP 实跑确认，而非只靠静态读代码。

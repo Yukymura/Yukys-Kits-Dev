@@ -1,4 +1,4 @@
-# 导表工具（excel_import_tools）
+# 导表工具（data_tools）
 
 把「规定格式」的 CSV 表格导出为 JSON 数据文件，并在游戏内通过 `GameDB` 访问。
 

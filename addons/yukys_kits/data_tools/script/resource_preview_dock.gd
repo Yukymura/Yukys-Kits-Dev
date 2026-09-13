@@ -2,12 +2,12 @@
 # ResourcePreviewDock —— 资源库预览面板（编辑器）
 #
 # 参照数据预览（PreviewDock）：
-#   - 顶部：资源库路径输入框 + 「设置」按钮（选择目录）。
 #   - 中部：资源文件树，不同种类资源用不同背景颜色区分：
 #       图片（蓝）/ 音频（绿）/ Godot 资源（橙）。
 #   - 点击文件：场景用场景编辑器、脚本用脚本编辑器；图片/音频/Godot 资源用
 #     Inspector 打开（图片/音频显示预览）。
 #   - 文件图标与文件系统 Dock 对齐（按资源类型取编辑器主题图标）。
+#   - 资源库路径在「设置」页配置，路径变更时自动刷新文件树。
 #   - 定时监听目录变更，自动刷新文件树。
 # ================================================================================
 
@@ -23,10 +23,7 @@ const COLOR_AUDIO := Color(0.22, 0.80, 0.45, 0.25)  # 音频 —— 绿
 const COLOR_GODOT := Color(1.0, 0.66, 0.22, 0.25)   # Godot 资源 —— 橙
 
 @onready var path_label: Label = $Scroll/VBox/Header/PathLabel
-@onready var resource_path_edit: LineEdit = $Scroll/VBox/HBox3/ResourcePathEdit
 @onready var resource_tree: Tree = $Scroll/VBox/ResourceTree
-@onready var select_resource_button: Button = $Scroll/VBox/HBox3/SelectResourceButton
-@onready var resource_dir_dialog: FileDialog = $ResourceDirDialog
 
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
@@ -45,11 +42,6 @@ func _ready() -> void:
 	_refresh_resource_path()
 
 func _setup() -> void:
-	resource_path_edit.editable = false
-
-	resource_dir_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
-	resource_dir_dialog.access = FileDialog.ACCESS_RESOURCES
-
 	_watch_timer = Timer.new()
 	_watch_timer.wait_time = 1.0
 	_watch_timer.autostart = true
@@ -57,8 +49,6 @@ func _setup() -> void:
 	add_child(_watch_timer)
 
 func _connect_signals() -> void:
-	select_resource_button.pressed.connect(_on_select_resource_pressed)
-	resource_dir_dialog.dir_selected.connect(_on_resource_dir_selected)
 	resource_tree.item_selected.connect(_on_tree_item_selected)
 
 func _connect_importer_signals() -> void:
@@ -68,18 +58,11 @@ func _connect_importer_signals() -> void:
 		_importer.resource_path_changed.connect(_refresh_resource_path)
 
 # ================================================================================
-# 路径 + 文件树
-
-func _on_select_resource_pressed() -> void:
-	resource_dir_dialog.popup_centered_ratio(0.6)
-
-func _on_resource_dir_selected(path: String) -> void:
-	_importer.set_resource_path(path)
+# 文件树
 
 func _refresh_resource_path() -> void:
 	if _importer == null:
 		return
-	resource_path_edit.text = _importer.get_resource_path()
 	_refresh_tree()
 
 func _refresh_tree() -> void:
@@ -137,15 +120,22 @@ func _color_for(ext: String) -> Color:
 	return COLOR_GODOT
 
 func _icon_for(full: String, ext: String) -> Texture2D:
-	# 与文件系统 Dock 对齐：按资源类型取编辑器主题图标（同一套图标来源）
+	# 与文件系统 Dock 对齐：按资源类型（get_file_type）取编辑器主题图标。
+	# 具体子类（如 AudioStreamMP3、CompressedTexture2D）通常没有独立图标，
+	# 沿继承链回退到基类图标（AudioStream、Texture2D），与 Godot 自身的 FileSystemDock 一致。
 	var type := EditorInterface.get_resource_filesystem().get_file_type(full)
 	if type.is_empty():
 		type = _type_for_ext(ext)
-	if type.is_empty():
-		return get_theme_icon("file", "FileDialog")
+	return _editor_icon(type)
+
+func _editor_icon(type: String) -> Texture2D:
 	var editor_theme := EditorInterface.get_editor_theme()
-	if editor_theme.has_icon(type, "EditorIcons"):
-		return editor_theme.get_icon(type, "EditorIcons")
+	var cls := type
+	while not cls.is_empty():
+		if editor_theme.has_icon(cls, "EditorIcons"):
+			return editor_theme.get_icon(cls, "EditorIcons")
+		cls = ClassDB.get_parent_class(cls)
+	# 兜底：通用文件图标。
 	return get_theme_icon("file", "FileDialog")
 
 func _type_for_ext(ext: String) -> String:

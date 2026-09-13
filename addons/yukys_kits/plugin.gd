@@ -1,20 +1,20 @@
 @tool
 extends EditorPlugin
 
-const MAIN_PANEL := preload("res://addons/yukys_kits/excel_import_tools/scene/main_panel.tscn")
-const DataImporterScript := preload("res://addons/yukys_kits/excel_import_tools/script/data_importer.gd")
-const ConfigToolScript := preload("res://addons/yukys_kits/excel_import_tools/tool/config_tool.gd")
+const MAIN_PANEL := preload("res://addons/yukys_kits/data_tools/scene/main_panel.tscn")
+const DataImporterScript := preload("res://addons/yukys_kits/data_tools/script/data_importer.gd")
+const ConfigToolScript := preload("res://addons/yukys_kits/data_tools/tool/config_tool.gd")
 const McpCustomToolSpec := preload("res://addons/godot_ai/custom_tools/mcp_custom_tool_spec.gd")
 const McpToolRegistry := preload("res://addons/godot_ai/custom_tools/mcp_tool_registry.gd")
 const JsonData := preload("res://addons/yukys_kits/runtime/json_data_tool.gd")
 
-const CONFIG_PATH := "res://addons/yukys_kits/excel_import_tools/config.json"
+const CONFIG_PATH := "res://addons/yukys_kits/data_tools/config.json"
 const DEFAULT_DOCK_NAME := "导表工具"
 
 const PAGE_PREVIEW := "PreviewDock"
 const PAGE_IMPORT := "ImportDock"
 const EXPORT_TOOL_NAME := "yukys_export_csv"
-const EXPORT_TOOL_SCRIPT := "res://addons/yukys_kits/excel_import_tools/script/mcp_export_tool.gd"
+const EXPORT_TOOL_SCRIPT := "res://addons/yukys_kits/data_tools/script/mcp_export_tool.gd"
 
 var _main_panel: Variant
 var _importer: DataImporterScript

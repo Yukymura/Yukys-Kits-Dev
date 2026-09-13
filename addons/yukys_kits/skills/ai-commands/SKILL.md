@@ -46,7 +46,7 @@ custom_manage(op="invoke", params={
 })
 ```
 
-处理器 `excel_import_tools/script/mcp_export_tool.gd`（方法 `export_csv`）内部做两件事：
+处理器 `data_tools/script/mcp_export_tool.gd`（方法 `export_csv`）内部做两件事：
 
 1. 切到导表页：`MainPanel.show_page("ImportDock")`。
 2. 调用现有接口：`DataImporter.import_csv(csv_path, output_dir)`。
@@ -83,7 +83,7 @@ custom_manage(op="invoke", params={
 
 ## 新增一条 AI 指令（给开发者）
 
-1. 在 `excel_import_tools/script/` 下新建处理器 `.gd`，方法返回 MCP 信封：成功 `{"data": {…}}`，失败 `ErrorCodes.make(code, msg)`（参考 `mcp_export_tool.gd`）。
+1. 在 `data_tools/script/` 下新建处理器 `.gd`，方法返回 MCP 信封：成功 `{"data": {…}}`，失败 `ErrorCodes.make(code, msg)`（参考 `mcp_export_tool.gd`）。
 2. 在 `plugin.gd` 的 `_register_export_tool()` 处用 `McpToolRegistry.register(McpCustomToolSpec)` 注册，`_exit_tree` 里注销。
 3. 在本 skill 的「指令清单」加一行，并新增对应详细章节（触发句式/参数/执行方式/返回值）。
 4. 在 `需求文档.md`（新增 FEAT 行）与 `原始需求` 里跟踪状态。
