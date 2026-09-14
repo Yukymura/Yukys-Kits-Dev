@@ -1,0 +1,8 @@
+﻿setting_config,,,,,,,,
+#,设置名(显示在设置项),设置类型(设置项格式类型 1=勾选框;2=输入框;3=路径框;4=选项框;5=颜色框),关联字段(设置的字段名),所属分栏(设置的分区，对应设置栏配置表),顺序(在分区内的排序权重，小的排前面),设置描述(鼠标悬停时显示的文本),选项(供下拉列表选项使用，没有就不填),默认值(需要根据对应类型解析)
+*id,setting_name:String,type:int,data_name:String,colume:int,index:int,description:String,option:Array[String],default:String
+1001,数据库路径,3,export_path,1,1,,,res://data
+2001,资源库路径,3,resource_path,2,1,,,res://res
+2002,图片背景色,5,pic_bg_color,2,2,,,459fff40
+2003,音频背景色,5,audio_bg_color,2,3,,,38cc7340
+2004,资源背景色,5,res_bg_color,2,4,,,ffa83840

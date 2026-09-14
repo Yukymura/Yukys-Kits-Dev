@@ -1,86 +1,86 @@
 # ================================================================================
-# SettingsDock —— 设置界面（排在 tab 页最后，按功能分区组织设置）
+# SettingsDock —— 设置界面（排在 tab 页最后）
 #
-# 分区：
-#   - 数据：数据库路径（DataImporter.export_path，也是运行时 GameDB 读取的数据目录）。
-#   - 资源库：资源库路径（DataImporter.resource_path，供资源预览面板浏览）。
-#   - 资源库：分类背景配色（DataImporter.get/set_resource_color，图片/音频/Godot 资源）。
-# 所有设置均通过 DataImporter 的 setter 持久化到 config.json（合并写入，保留其它字段）。
+# 数据驱动：根据「设置栏配置表」+「设置项配置表」导出的 JSON 生成界面。
+#   - 栏位（栏）→ SettingSection 场景
+#   - 设置项     → SettingItem 场景（按 type 显示不同控件）
+# 每个设置项按 data_name 通过 DataImporter.get_setting / set_setting 读写，
+# 由 DataImporter 统一持久化到 config.json。
 # ================================================================================
 
 @tool
 extends Control
 
-@onready var db_path_edit: LineEdit = $Scroll/VBox/DataSection/DBPathEdit
-@onready var select_db_button: Button = $Scroll/VBox/DataSection/SelectDBButton
-@onready var resource_path_edit: LineEdit = $Scroll/VBox/ResourceSection/ResourcePathEdit
-@onready var select_resource_button: Button = $Scroll/VBox/ResourceSection/SelectResourceButton
-@onready var db_dir_dialog: FileDialog = $DBDirDialog
-@onready var resource_dir_dialog: FileDialog = $ResourceDirDialog
-@onready var image_color_picker: ColorPickerButton = $Scroll/VBox/ImageColorRow/ImageColorPicker
-@onready var audio_color_picker: ColorPickerButton = $Scroll/VBox/AudioColorRow/AudioColorPicker
-@onready var godot_color_picker: ColorPickerButton = $Scroll/VBox/GodotColorRow/GodotColorPicker
+const SettingSectionScene := preload("res://addons/yukys_kits/data_tools/scene/setting_section.tscn")
+const SettingItemScene := preload("res://addons/yukys_kits/data_tools/scene/setting_item.tscn")
+const Config := preload("res://addons/yukys_kits/data_tools/tool/config_tool.gd")
+
+const COLUME_CONFIG_PATH := "res://addons/yukys_kits/data_tools/datas/setting_colume_config.json"
+const ITEM_CONFIG_PATH := "res://addons/yukys_kits/data_tools/datas/setting_config.json"
+
+@onready var items_box: VBoxContainer = $Scroll/VBox
 
 var _importer: Variant
 
 func set_importer(importer) -> void:
 	_importer = importer
 	if is_node_ready():
-		_refresh()
+		_build()
 
 func _ready() -> void:
-	_setup()
-	_connect_signals()
-	_refresh()
+	_build()
 
-func _setup() -> void:
-	db_path_edit.editable = false
-	resource_path_edit.editable = false
-	db_dir_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
-	db_dir_dialog.access = FileDialog.ACCESS_RESOURCES
-	resource_dir_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
-	resource_dir_dialog.access = FileDialog.ACCESS_RESOURCES
-
-func _connect_signals() -> void:
-	select_db_button.pressed.connect(_on_select_db_pressed)
-	select_resource_button.pressed.connect(_on_select_resource_pressed)
-	db_dir_dialog.dir_selected.connect(_on_db_dir_selected)
-	resource_dir_dialog.dir_selected.connect(_on_resource_dir_selected)
-	image_color_picker.popup_closed.connect(_on_image_color_picker_closed)
-	audio_color_picker.popup_closed.connect(_on_audio_color_picker_closed)
-	godot_color_picker.popup_closed.connect(_on_godot_color_picker_closed)
-
-func _refresh() -> void:
+func _build() -> void:
 	if _importer == null:
 		return
-	db_path_edit.text = _importer.get_export_path()
-	resource_path_edit.text = _importer.get_resource_path()
-	image_color_picker.color = _importer.get_resource_color("image")
-	audio_color_picker.color = _importer.get_resource_color("audio")
-	godot_color_picker.color = _importer.get_resource_color("godot")
+	for child in items_box.get_children():
+		child.queue_free()
 
-func _on_select_db_pressed() -> void:
-	db_dir_dialog.popup_centered_ratio(0.6)
+	var colume_table := _load_table_data(COLUME_CONFIG_PATH)  # id -> {colume_name, index}
+	var item_table := _load_table_data(ITEM_CONFIG_PATH)      # id -> {setting_name, type, ...}
 
-func _on_select_resource_pressed() -> void:
-	resource_dir_dialog.popup_centered_ratio(0.6)
+	# 按栏位分组
+	var sections := {}  # colume_id(String) -> {name, index, items: Array}
+	for id in item_table:
+		var item: Dictionary = item_table[id]
+		# 导表 JSON 里数字被解析成 float（1 -> 1.0），而栏位表的键是字符串 "1"，
+		# 必须先用 int() 归一化再转字符串，否则 str(1.0) == "1.0" 匹配不到栏位。
+		var colume_id := str(int(item.get("colume", 0)))
+		if not sections.has(colume_id):
+			var colume: Dictionary = colume_table.get(colume_id, {})
+			sections[colume_id] = {
+				"name": str(colume.get("colume_name", "")),
+				"index": int(colume.get("index", 0)),
+				"items": [],
+			}
+		sections[colume_id]["items"].append(item)
 
-func _on_db_dir_selected(path: String) -> void:
-	_importer.set_export_path(path)
-	_refresh()
+	# 栏位按 index 排序
+	var section_ids := sections.keys()
+	section_ids.sort_custom(func(a, b): return sections[a]["index"] < sections[b]["index"])
 
-func _on_resource_dir_selected(path: String) -> void:
-	_importer.set_resource_path(path)
-	_refresh()
+	for colume_id in section_ids:
+		var section: Dictionary = sections[colume_id]
+		var section_node := SettingSectionScene.instantiate()
+		items_box.add_child(section_node)
+		section_node.setup(section["name"])
 
-# 配色只在用户关闭取色器时保存一次（popup_closed），避免拖动取色时反复写盘。
-func _on_image_color_picker_closed() -> void:
-	_importer.set_resource_color("image", image_color_picker.color)
+		var items: Array = section["items"]
+		items.sort_custom(func(a, b): return a["index"] < b["index"])
+		for item in items:
+			var item_node := SettingItemScene.instantiate()
+			section_node.add_item(item_node)
+			item_node.setup(_importer, item)
 
-func _on_audio_color_picker_closed() -> void:
-	_importer.set_resource_color("audio", audio_color_picker.color)
-
-func _on_godot_color_picker_closed() -> void:
-	_importer.set_resource_color("godot", godot_color_picker.color)
+func _load_table_data(path: String) -> Dictionary:
+	var r := Config.load_config(path)
+	if not r.get("ok", false):
+		return {}
+	var root: Variant = r.get("data", {})
+	if root is Dictionary:
+		var table: Variant = root.get("data", {})
+		if table is Dictionary:
+			return table
+	return {}
 
 # ================================================================================

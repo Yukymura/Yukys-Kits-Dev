@@ -1,0 +1,19 @@
+{
+	"data": {
+		"1": {
+			"colume_name": "数据",
+			"index": 1
+		},
+		"2": {
+			"colume_name": "资源",
+			"index": 2
+		}
+	},
+	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/addons/yukys_kits/data_tools/chart/设置栏配置表.csv",
+	"table_name": "setting_colume_config",
+	"types": {
+		"colume_name": "String",
+		"index": "int"
+	},
+	"update_time": "2026-09-14T16:01:20"
+}

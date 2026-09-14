@@ -20,6 +20,12 @@ signal resource_path_changed
 signal resource_colors_changed
 
 const CONFIG_PATH := "res://addons/yukys_kits/data_tools/config.json"
+const SETTING_CONFIG_PATH := "res://addons/yukys_kits/data_tools/datas/setting_config.json"
+
+# 「设置项配置表」type 字段取值（与 setting_item.gd 的 TYPE_* 常量一致）。
+# 默认值转换只需区分 bool / Color / 其余（String），故这里只定义用到的两个。
+const TYPE_CHECKBOX := 1
+const TYPE_COLOR := 5
 
 const CsvParser := preload("res://addons/yukys_kits/data_tools/tool/csv_parser.gd")
 const JsonData := preload("res://addons/yukys_kits/runtime/json_data_tool.gd")
@@ -40,15 +46,15 @@ var resource_path: String = "res://assets":
 		resource_path_changed.emit()
 
 # 资源库分类背景色（图片/音频/Godot 资源），可在「设置」页修改并持久化到 config.json。
-# resource_colors 只存用户改动过的 key -> Color；未设置的 key 回退到 DEFAULT_RESOURCE_COLORS。
-const RESOURCE_COLOR_KEYS: Array = ["image", "audio", "godot"]
-const DEFAULT_RESOURCE_COLORS := {
-	"image": Color(0.27, 0.52, 1.0, 0.25),   # 图片 —— 蓝
-	"audio": Color(0.22, 0.80, 0.45, 0.25),  # 音频 —— 绿
-	"godot": Color(1.0, 0.66, 0.22, 0.25),   # Godot 资源 —— 橙
-}
+# 字段名与「设置项配置表」的 data_name 对齐（pic_bg_color / audio_bg_color / res_bg_color），
+# 直接作为 config.json 顶层字段持久化。默认值：图片蓝 / 音频绿 / Godot 资源橙。
+var pic_bg_color: Color = Color(0.27, 0.52, 1.0, 0.25)     # 图片 —— 蓝
+var audio_bg_color: Color = Color(0.22, 0.80, 0.45, 0.25)  # 音频 —— 绿
+var res_bg_color: Color = Color(1.0, 0.66, 0.22, 0.25)     # Godot 资源 —— 橙
 
-var resource_colors: Dictionary = {}  # key -> Color
+# 设置项默认值（data_name -> 已按类型转换的默认值），来自「设置项配置表」的 default 列。
+# 两大用途：_load_settings() 里作为「用户未设置过」时的回退值；设置界面重置按钮读取。
+var _setting_defaults: Dictionary = {}
 
 # 配置在 _init() 里同步加载（而非 _ready()）。plugin.gd 在 new() 之后、把 importer
 # 注入 dock 之前就完成了加载，保证 resource_path 等字段立刻是最新值——否则资源库
@@ -63,13 +69,18 @@ func _ready() -> void:
 	Log.info("DataImporter 初始化完成，导出路径: %s" % export_path)
 
 func _load_settings() -> void:
+	_load_setting_defaults()
 	var cfg := Config.load_config(CONFIG_PATH)
 	if cfg.ok:
 		var data: Dictionary = cfg.data
-		export_path = data.get("export_path", JsonData.DEFAULT_DATA_DIR)
+		# 未设置过的字段回退到「设置项配置表」的默认值；配置表缺失时再回退到
+		# 字段声明处的硬编码默认值。
+		export_path = data.get("export_path", _setting_defaults.get("export_path", JsonData.DEFAULT_DATA_DIR))
 		log_path = data.get("log_path", "")
-		resource_path = data.get("resource_path", "res://assets")
-		resource_colors = _parse_resource_colors(data.get("resource_colors", {}))
+		resource_path = data.get("resource_path", _setting_defaults.get("resource_path", "res://assets"))
+		pic_bg_color = _parse_color(data.get("pic_bg_color", ""), _setting_defaults.get("pic_bg_color", pic_bg_color))
+		audio_bg_color = _parse_color(data.get("audio_bg_color", ""), _setting_defaults.get("audio_bg_color", audio_bg_color))
+		res_bg_color = _parse_color(data.get("res_bg_color", ""), _setting_defaults.get("res_bg_color", res_bg_color))
 
 # ================================================================================
 # 导表
@@ -124,15 +135,67 @@ func set_resource_path(path: String) -> void:
 	resource_path = path
 	_save_config()
 
-func get_resource_color(key: String) -> Color:
-	if resource_colors.has(key):
-		return resource_colors[key]
-	return DEFAULT_RESOURCE_COLORS.get(key, Color.WHITE)
+# 资源库按分类（image/audio/godot）读取背景色。分类名是资源库自己的语义，
+# 底层映射到「设置项配置表」的字段 pic_bg_color / audio_bg_color / res_bg_color。
+func get_resource_color(category: String) -> Color:
+	match category:
+		"image":
+			return pic_bg_color
+		"audio":
+			return audio_bg_color
+		"godot":
+			return res_bg_color
+	return Color.WHITE
 
-func set_resource_color(key: String, color: Color) -> void:
-	resource_colors[key] = color
+func set_resource_color(category: String, color: Color) -> void:
+	match category:
+		"image":
+			pic_bg_color = color
+		"audio":
+			audio_bg_color = color
+		"godot":
+			res_bg_color = color
 	_save_config()
 	resource_colors_changed.emit()
+
+# ================================================================================
+# 设置项通用读写（供数据驱动的设置界面使用）
+#
+# 设置界面的每个配置项都由「设置项配置表」驱动，data_name 即其持久化字段名。
+# 这里按 data_name 返回/接收「类型化」的值（颜色返回 Color、路径返回 String），
+# 由界面控件直接消费；序列化（Color -> 十六进制）在 _save_config() 内统一处理。
+# 新增设置项时：在配置表加一行，并在此处补一个 match 分支即可。
+func get_setting(data_name: String) -> Variant:
+	match data_name:
+		"export_path":
+			return export_path
+		"resource_path":
+			return resource_path
+		"pic_bg_color":
+			return pic_bg_color
+		"audio_bg_color":
+			return audio_bg_color
+		"res_bg_color":
+			return res_bg_color
+	return null
+
+func set_setting(data_name: String, value) -> void:
+	match data_name:
+		"export_path":
+			set_export_path(value)
+		"resource_path":
+			set_resource_path(value)
+		"pic_bg_color":
+			set_resource_color("image", value)
+		"audio_bg_color":
+			set_resource_color("audio", value)
+		"res_bg_color":
+			set_resource_color("godot", value)
+
+# 返回设置项的默认值（来自「设置项配置表」的 default 列，已按类型转换）。
+# 供设置界面的「重置」按钮使用；配置表缺该字段时返回 null。
+func get_setting_default(data_name: String) -> Variant:
+	return _setting_defaults.get(data_name)
 
 func load_data_file(path: String) -> Dictionary:
 	return JsonData.load_file(path)
@@ -172,25 +235,45 @@ func _save_config() -> void:
 	data["export_path"] = export_path
 	data["log_path"] = log_path
 	data["resource_path"] = resource_path
-	data["resource_colors"] = _serialize_resource_colors()
+	data["pic_bg_color"] = pic_bg_color.to_html(true)
+	data["audio_bg_color"] = audio_bg_color.to_html(true)
+	data["res_bg_color"] = res_bg_color.to_html(true)
+	data.erase("resource_colors")  # 清理旧版嵌套字段
 	Config.save_config(CONFIG_PATH, data)
 
-# config.json 里存十六进制颜色字符串（#rrggbbaa），读入时转回 Color；非法/缺失回退默认色。
-func _parse_resource_colors(raw) -> Dictionary:
-	var out: Dictionary = {}
-	if not raw is Dictionary:
-		return out
-	for key in RESOURCE_COLOR_KEYS:
-		var v = raw.get(key, "")
-		if v is String and not v.is_empty():
-			out[key] = Color.from_string(v, DEFAULT_RESOURCE_COLORS[key])
-	return out
+# config.json 里颜色存十六进制字符串（rrggbbaa，无 # 前缀），读入时转回 Color；
+# 非法/缺失时回退到当前值（即字段默认值）。
+func _parse_color(raw, default: Color) -> Color:
+	if raw is String and not raw.is_empty():
+		return Color.from_string(raw, default)
+	return default
 
-func _serialize_resource_colors() -> Dictionary:
-	var out: Dictionary = {}
-	for key in resource_colors:
-		out[key] = (resource_colors[key] as Color).to_html(true)
-	return out
+# 读取「设置项配置表」导出的 setting_config.json，把每行的 default（String）
+# 按 type 转换成对应类型，缓存到 _setting_defaults（data_name -> 默认值）。
+func _load_setting_defaults() -> void:
+	var cfg := Config.load_config(SETTING_CONFIG_PATH)
+	if not cfg.ok:
+		return
+	var items: Dictionary = (cfg.data as Dictionary).get("data", {})
+	for _id in items:
+		var item: Dictionary = items[_id]
+		var data_name: String = str(item.get("data_name", ""))
+		if data_name.is_empty():
+			continue
+		var raw: String = str(item.get("default", ""))
+		var t: int = int(item.get("type", 0))
+		_setting_defaults[data_name] = _convert_default(raw, t)
+
+# 「设置项配置表」导出的 default 均为 String，按设置类型转换：
+#   类型 5（颜色）-> Color；类型 1（勾选）-> bool；其余 -> String。
+func _convert_default(raw: String, type: int) -> Variant:
+	match type:
+		TYPE_CHECKBOX:
+			return raw.strip_edges().to_lower() in ["true", "1", "yes"]
+		TYPE_COLOR:
+			return Color.from_string(raw, Color.WHITE)
+		_:
+			return raw
 
 func _refresh_filesystem(path: String) -> void:
 	files_changed.emit()

@@ -204,6 +204,50 @@ custom_manage(op="invoke", params={
 - 工具返回「导表工具未就绪」→ 插件未启用，检查 `project.godot` 的 `editor_plugins/enabled` 是否含 `yukys_kits`。
 - `custom_manage(op="list")` 看不到 `yukys_export_csv` → 插件尚未重载；在「项目设置 → 插件」里禁用再启用 yukys_kits（或重启编辑器）。
 
+## 设置界面（数据驱动）
+
+设置 tab（排在主面板最后）集中管理插件配置：数据库路径、资源库路径、资源库分类背景色。界面由两张导表驱动（同 CSV→JSON 流程），新增/调整设置项只需改表再重新导表。
+
+### 配置表
+
+| 表 | CSV | 导出的 JSON | 作用 |
+| --- | --- | --- | --- |
+| 设置栏配置表 | `data_tools/chart/设置栏配置表.csv` | `data_tools/datas/setting_colume_config.json` | 栏位（分区）：`id` / `colume_name` / `index` |
+| 设置项配置表 | `data_tools/chart/设置项配置表.csv` | `data_tools/datas/setting_config.json` | 设置项：类型、关联字段、顺序、默认值 |
+
+设置项配置表字段：
+
+| 字段 | 说明 |
+| --- | --- |
+| `id` | 设置项唯一 id（表内标识，无业务含义） |
+| `setting_name` | 显示在设置项上的名字 |
+| `type` | 控件类型：`1`=勾选框、`2`=输入框、`3`=路径框、`4`=选项框、`5`=颜色框 |
+| `data_name` | 持久化字段名（即写入 `config.json` 的键） |
+| `colume` | 所属栏位 id（对应设置栏配置表的 id） |
+| `index` | 栏位内排序权重（小的排前面） |
+| `description` | 鼠标悬停提示（可选） |
+| `option` | `Array[String]`，供选项框使用（可选） |
+| `default` | 默认值，**均为 String**，按 `type` 转换（见下） |
+
+### 默认值与重置（需求 3.2）
+
+- 默认值来自配置表 `default` 列，导出后仍是 String，按 `type` 转换：
+  - `type=5`（颜色）→ `Color`（`Color.from_string`，hex 无 `#`，如 `459fff40`）
+  - `type=1`（勾选）→ `bool`（`true`/`1`/`yes` 视为真）
+  - 其余 → 保持 String
+- 加载顺序：`DataImporter._load_settings()` 先读 `setting_config.json` 把每行默认值按类型缓存到 `_setting_defaults`（`_load_setting_defaults`），再读 `config.json`；**用户未设置过的字段回退到配置表默认值**（配置表缺失时再回退到脚本里字段声明处的硬编码值）。
+- 每个设置项右侧有一个「重置」图标按钮（Godot 检查器同款 `Reload` 图标，tooltip「重置为默认值」），点击调用 `set_setting(data_name, get_setting_default(data_name))` 恢复默认并刷新控件。
+
+### 设置项读写 API（DataImporter）
+
+```gdscript
+DataImporter.get_setting(data_name)          # 读当前值（颜色返回 Color、路径返回 String）
+DataImporter.set_setting(data_name, value)   # 写值并持久化到 config.json
+DataImporter.get_setting_default(data_name)  # 读配置表默认值（已按类型转换），无则 null
+```
+
+新增设置项：在「设置项配置表」加一行 → 重新导表 → 在 `DataImporter.get_setting` / `set_setting` 的 `match` 里补一个分支。颜色字段的十六进制序列化由 `_save_config()` 统一处理（`Color.to_html(true)` / `_parse_color`）。
+
 ## 导表 log 读取方法
 
 ### 日志位置
@@ -244,3 +288,5 @@ custom_manage(op="invoke", params={
 ### 配置项
 
 `config.json` 支持：`export_path`（导出目录，默认 `res://data`）、`log_path`（日志路径）、`dock_name`（Dock 标签名，改后需重载插件）、`panel_names`（各子面板 tab 标题，key 为页面节点名）。
+
+设置相关字段（`resource_path`、`pic_bg_color` / `audio_bg_color` / `res_bg_color`）与默认值/重置机制见上文「设置界面（数据驱动）」。

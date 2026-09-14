@@ -1,0 +1,67 @@
+{
+	"data": {
+		"1001": {
+			"colume": 1,
+			"data_name": "export_path",
+			"default": "res://data",
+			"description": "",
+			"index": 1,
+			"option": [],
+			"setting_name": "数据库路径",
+			"type": 3
+		},
+		"2001": {
+			"colume": 2,
+			"data_name": "resource_path",
+			"default": "res://res",
+			"description": "",
+			"index": 1,
+			"option": [],
+			"setting_name": "资源库路径",
+			"type": 3
+		},
+		"2002": {
+			"colume": 2,
+			"data_name": "pic_bg_color",
+			"default": "459fff40",
+			"description": "",
+			"index": 2,
+			"option": [],
+			"setting_name": "图片背景色",
+			"type": 5
+		},
+		"2003": {
+			"colume": 2,
+			"data_name": "audio_bg_color",
+			"default": "38cc7340",
+			"description": "",
+			"index": 3,
+			"option": [],
+			"setting_name": "音频背景色",
+			"type": 5
+		},
+		"2004": {
+			"colume": 2,
+			"data_name": "res_bg_color",
+			"default": "ffa83840",
+			"description": "",
+			"index": 4,
+			"option": [],
+			"setting_name": "资源背景色",
+			"type": 5
+		}
+	},
+	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/addons/yukys_kits/data_tools/chart/设置项配置表.csv",
+	"table_name": "setting_config",
+	"types": {
+		"colume": "int",
+		"data_name": "String",
+		"default": "String",
+		"description": "String",
+		"index": "int",
+		"option": "Array[String]",
+		"setting_name": "String",
+		"type": "int"
+	},
+	"update_time": "2026-09-14T15:53:29"
+}

@@ -1,4 +1,5 @@
 {
+	"audio_bg_color": "38cc7340",
 	"dock_name": "神奇小工具",
 	"export_path": "res://data",
 	"log_path": "res://addons/yukys_kits/data_tools/logs/import.log",
@@ -8,10 +9,7 @@
 		"ResourcePreviewDock": "资源库",
 		"SettingsDock": "设置"
 	},
-	"resource_colors": {
-		"audio": "38cc7340",
-		"godot": "ffa83840",
-		"image": "459fff40"
-	},
+	"pic_bg_color": "459fff40",
+	"res_bg_color": "ffa83840",
 	"resource_path": "res://res"
 }

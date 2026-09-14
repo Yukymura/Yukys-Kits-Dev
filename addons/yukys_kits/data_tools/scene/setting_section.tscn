@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://addons/yukys_kits/data_tools/script/setting_section.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[node name="SettingSection" type="VBoxContainer"]
+script = ExtResource("1")
+
+[node name="Header" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="TitleLabel" type="Label" parent="Header"]
+layout_mode = 2
+text = "栏位"
+
+[node name="ItemsBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4

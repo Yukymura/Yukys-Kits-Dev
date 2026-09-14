@@ -21,8 +21,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 GameDB="*res://addons/yukys_kits/runtime/game_db.tscn"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
 

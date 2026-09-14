@@ -12,7 +12,7 @@ extends Control
 const COLOR_NEUTRAL := Color(1, 1, 1)
 const COLOR_OK := Color(0.4, 0.9, 0.4)
 const COLOR_ERR := Color(1, 0.4, 0.4)
-const COLOR_WARN := Color(1, 0.62, 0.3)
+const COLOR_WARN := Color(0.9, 0.7, 0.0, 1.0)
 
 @onready var csv_path_edit: LineEdit = $Scroll/VBox/HBox1/CsvPathEdit
 @onready var output_path_edit: LineEdit = $Scroll/VBox/HBox2/OutputPathEdit
