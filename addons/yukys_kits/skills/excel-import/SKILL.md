@@ -151,6 +151,54 @@ if r.ok:
 
 运行时读整目录请直接走 `GameDB`（`get_table` / `get_row`），或调用 `JsonData.load_all("res://data")`。
 
+## 资源库资源加载（需求 2.1）
+
+`GameDB` 除取数外，还提供从「资源库」加载外部导入资源（图片/音频/Godot 资源）的能力。资源库目录与数据库目录一样，由编辑器「设置」页配置、`DataImporter` 同步写入 ProjectSettings（键 `addons/yukys_kits/resource_dir`，缺省 `res://res`）。
+
+### API
+
+```gdscript
+GameDB.get_resource_dir()        # String         资源库目录（ProjectSettings，缺省 res://res）
+GameDB.resolve_resource_path(p)  # String         相对路径 → 拼上资源库目录；res:// / user:// / 绝对路径原样返回
+GameDB.list_resource_files()     # Array[String]  资源库下所有资源文件（相对资源库目录的路径，已排序）
+GameDB.get_resource_type(p)      # String         资源分类：image / audio / godot / ""
+GameDB.is_resource_file(p)       # bool           是否为受支持的资源文件
+GameDB.load_sprite(p)            # Texture2D      加载图片（png/jpg/webp/...）
+GameDB.load_audio(p)             # AudioStream    加载音频（wav/ogg/mp3/...）
+GameDB.load_resource(p)          # Resource       加载 Godot 资源（.tres/.res/.tscn/.gdshader 等）
+GameDB.clear_resource_cache()    # void           清空资源缓存
+```
+
+`p` 支持两种写法：相对资源库的路径（`"pic/啤酒.png"`）或完整 `res://` 路径（`"res://res/pic/啤酒.png"`）。加载失败（文件不存在）返回 `null`，不报错，业务代码按需判空。
+
+`list_resource_files()` 返回相对资源库目录的路径（如 `pic/啤酒.png`），可直接传给 `load_sprite` / `load_audio` / `load_resource`；`get_resource_type()` 用于按分类区分图片/音频/Godot 资源（做文件树着色、选择加载分支等）。
+
+### 性能：缓存
+
+同一路径重复加载会命中缓存、返回**同一实例**，避免反复解析/解码。需要重新加载或主动释放内存时调用 `clear_resource_cache()`。缓存按「解析后的完整路径」为键。
+
+### 导出后 res:// 路径变化的问题（重点）
+
+- 编辑器里 `res://` 指向项目根目录；**导出后 `res://` 指向 `.pck`**。
+- 若资源库里的外部资源按「保留文件（Export Mode: keep）」方式导出到 exe 旁（而非打进 pck），`res://res/pic/啤酒.png` 这类路径在导出后就会失效。
+- `GameDB` 的加载按以下顺序回退，解决该问题：
+  1. `ResourceLoader`（编辑器内 / 已按导入方式打进 pck 的资源）；
+  2. `ProjectSettings.globalize_path()` 得到的全局化路径（编辑器=真实路径；导出后=exe 相对路径）；
+  3. `OS.get_executable_path().get_base_dir()` + `res://` 相对部分（exe 旁目录兜底）。
+- 命中文件系统路径后，按扩展名直接读原始文件：图片走 `Image.load_from_file` + `ImageTexture.create_from_image`，音频走 `AudioStreamWAV/OggVorbis/MP3.load_from_file`（均为静态方法，失败返回 null）。
+
+### 使用示例
+
+```gdscript
+var card: Texture2D = GameDB.load_sprite("pic/啤酒.png")          # 相对资源库
+var icon: Texture2D = GameDB.load_sprite("res://res/pic/弯刀.png") # 完整 res://
+var bgm: AudioStream = GameDB.load_audio("sfx/我的世界拾取物品.mp3")
+var theme: Theme = GameDB.load_resource("theme/theme1.tres")       # Godot 资源
+
+var card_path: String = GameDB.resolve_resource_path("pic/啤酒.png") # res://res/pic/啤酒.png
+GameDB.clear_resource_cache()  # 需要热更新资源时先清缓存再重新加载
+```
+
 ## AI 导表（单表导出）
 
 当用户输入指令 `单表导出xxx` 或 `单表导出 xxx`（xxx 为 CSV 的 `res://` 路径或用户绝对路径）时，AI 助手应切换到导表页并调用现有接口 `DataImporter.import_csv` 完成导出。

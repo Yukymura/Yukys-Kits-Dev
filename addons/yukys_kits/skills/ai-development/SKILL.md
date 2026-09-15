@@ -31,7 +31,7 @@ description: 使用 AI 开发 Yuky's Kits 插件（Godot 4.7）时的开发流�
    - `GameDB` 是静态 autoload（写进 `project.godot`，随游戏导出）。
    - `DataImporter` 是编辑器专用实例（`plugin.gd` 里 `new()` 并注入 dock/preview），**不写进 autoload、不随游戏导出**。
 2. **非插件场景只允许调用插件暴露的接口**，禁止调用插件内部接口：
-   - ✅ 可用：`GameDB`（`get_table_names()` / `get_table()` / `get_row()`）。
+   - ✅ 可用：`GameDB`（`get_table_names()` / `get_table()` / `get_row()` / `get_resource_dir()` / `resolve_resource_path()` / `list_resource_files()` / `get_resource_type()` / `is_resource_file()` / `load_sprite()` / `load_audio()` / `load_resource()` / `clear_resource_cache()`）。
    - ❌ 禁用：`JsonData`、`DataImporter`、`CsvParser`、`ConfigTool`、`Logger` 等内部类。
    - 测试场景缺什么公开能力，就在 `game_db.gd`（运行时）里**新增公开方法**，而不是让测试场景去 `preload` 内部脚本。
 3. **「AI 导表」通过 godot_ai 自定义 MCP 工具桥接**：插件 `_enter_tree` 向 `McpToolRegistry` 注册 `yukys_export_csv`（处理器 `data_tools/script/mcp_export_tool.gd`，经 `plugin.gd` 的静态访问器拿 importer/主面板）。所有 AI 指令的权威清单在 `skills/ai-commands/SKILL.md`；改导表或页面切换逻辑时，记得同步该工具、`ai-commands` 指令清单与 `skills/excel-import/SKILL.md` 的「AI 导表」章节。

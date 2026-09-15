@@ -69,14 +69,19 @@ func _exit_tree() -> void:
 	_importer_ref = null
 	_main_panel_ref = null
 
-# 注册 ProjectSettings 键：数据库目录。编辑器侧 DataImporter 写入、运行时 GameDB 读取，
-# 使 GameDB 不必写死 res://data。仅在键不存在时注册（避免覆盖用户已改的值）。
+# 注册 ProjectSettings 键：数据库目录与资源库目录。编辑器侧 DataImporter 写入、
+# 运行时 GameDB 读取，使 GameDB 不必写死 res://data / res://res。
+# 仅在键不存在时注册（避免覆盖用户已改的值）。
 func _register_project_settings() -> void:
-	if ProjectSettings.has_setting(JsonData.SETTING_DATA_DIR):
+	_register_dir_setting(JsonData.SETTING_DATA_DIR, JsonData.DEFAULT_DATA_DIR)
+	_register_dir_setting(JsonData.SETTING_RESOURCE_DIR, JsonData.DEFAULT_RESOURCE_DIR)
+
+func _register_dir_setting(key: String, default_value: String) -> void:
+	if ProjectSettings.has_setting(key):
 		return
-	ProjectSettings.set_setting(JsonData.SETTING_DATA_DIR, JsonData.DEFAULT_DATA_DIR)
+	ProjectSettings.set_setting(key, default_value)
 	ProjectSettings.add_property_info({
-		"name": JsonData.SETTING_DATA_DIR,
+		"name": key,
 		"type": TYPE_STRING,
 		"hint": PROPERTY_HINT_DIR,
 		"hint_string": "res://",

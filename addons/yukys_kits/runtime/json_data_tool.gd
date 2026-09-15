@@ -23,6 +23,12 @@ extends RefCounted
 const SETTING_DATA_DIR := "addons/yukys_kits/data_dir"
 const DEFAULT_DATA_DIR := "res://data"
 
+# 资源库目录（存放图片/音频/Godot 资源）的 ProjectSettings 键与默认值。
+# 与 SETTING_DATA_DIR 同理：编辑器侧写入，运行时侧（GameDB.load_sprite/load_audio 等）
+# 经此键读取，用于把相对路径解析到资源库，并在导出后解决 res:// 路径变化的问题。
+const SETTING_RESOURCE_DIR := "addons/yukys_kits/resource_dir"
+const DEFAULT_RESOURCE_DIR := "res://res"
+
 # ================================================================================
 # 写
 

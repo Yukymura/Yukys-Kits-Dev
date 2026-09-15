@@ -178,3 +178,4 @@
 [2026-09-14T16:04:13] [INFO] 开始导表: res://addons/yukys_kits/data_tools/chart/设置项配置表.csv -> res://addons/yukys_kits/data_tools/datas
 [2026-09-14T16:04:13] [DONE] 导表成功: res://addons/yukys_kits/data_tools/datas/setting_config.json（5 行）
 [2026-09-14T16:47:45] [INFO] DataImporter 初始化完成，导出路径: res://data
+[2026-09-15T09:47:21] [INFO] DataImporter 初始化完成，导出路径: res://data

@@ -65,6 +65,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	_sync_data_dir_setting()
+	_sync_resource_dir_setting()
 	Log.set_log_path(log_path)
 	Log.info("DataImporter 初始化完成，导出路径: %s" % export_path)
 
@@ -134,6 +135,7 @@ func get_resource_path() -> String:
 func set_resource_path(path: String) -> void:
 	resource_path = path
 	_save_config()
+	_sync_resource_dir_setting()
 
 # 资源库按分类（image/audio/godot）读取背景色。分类名是资源库自己的语义，
 # 底层映射到「设置项配置表」的字段 pic_bg_color / audio_bg_color / res_bg_color。
@@ -224,6 +226,16 @@ func _sync_data_dir_setting() -> void:
 	if ProjectSettings.get_setting(JsonData.SETTING_DATA_DIR, "") == export_path:
 		return
 	ProjectSettings.set_setting(JsonData.SETTING_DATA_DIR, export_path)
+	if Engine.is_editor_hint():
+		ProjectSettings.save()
+
+# 把资源库路径同步到 ProjectSettings（键 JsonData.SETTING_RESOURCE_DIR），供运行时
+# GameDB.load_sprite/load_audio 读取。与 _sync_data_dir_setting 同理，解决「导出后
+# res:// 路径变化」问题的基础：运行时经此键拿到用户配置的资源库路径，而非写死。
+func _sync_resource_dir_setting() -> void:
+	if ProjectSettings.get_setting(JsonData.SETTING_RESOURCE_DIR, "") == resource_path:
+		return
+	ProjectSettings.set_setting(JsonData.SETTING_RESOURCE_DIR, resource_path)
 	if Engine.is_editor_hint():
 		ProjectSettings.save()
 
