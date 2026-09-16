@@ -20,6 +20,10 @@ const GODOT_EXTS: Array = ["tres", "res", "tscn", "gdshader", "gd", "cs"]
 
 @onready var path_label: Label = $Scroll/VBox/Header/PathLabel
 @onready var resource_tree: Tree = $Scroll/VBox/ResourceTree
+@onready var search_button: Button = $Scroll/VBox/SearchBar/SearchButton
+@onready var whole_word_check: CheckBox = $Scroll/VBox/SearchBar/WholeWordCheck
+@onready var case_sensitive_check: CheckBox = $Scroll/VBox/SearchBar/CaseSensitiveCheck
+@onready var result_tree: Tree = $Scroll/VBox/ResultTree
 
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
@@ -46,9 +50,26 @@ func _setup() -> void:
 	_watch_timer.autostart = true
 	_watch_timer.timeout.connect(_on_watch_timeout)
 	add_child(_watch_timer)
+	_setup_result_tree()
+
+func _setup_result_tree() -> void:
+	# 搜索结果看板：3 列（文件 / 引用位置 / 路径），隐藏根节点。
+	result_tree.hide_root = true
+	result_tree.column_titles_visible = true
+	result_tree.columns = 3
+	result_tree.set_column_title(0, "文件")
+	result_tree.set_column_title(1, "引用")
+	result_tree.set_column_title(2, "路径")
+	result_tree.set_column_expand(0, true)
+	result_tree.set_column_expand(1, false)
+	result_tree.set_column_expand(2, true)
 
 func _connect_signals() -> void:
 	resource_tree.item_selected.connect(_on_tree_item_selected)
+	resource_tree.item_activated.connect(_on_tree_item_activated)
+	search_button.pressed.connect(_search_references)
+	whole_word_check.toggled.connect(_on_search_option_changed)
+	case_sensitive_check.toggled.connect(_on_search_option_changed)
 
 func _connect_importer_signals() -> void:
 	if _importer == null:
@@ -216,8 +237,25 @@ func _scan_dir(path: String, out: Dictionary) -> void:
 
 # ================================================================================
 # 点击资源 → 跳转 / 打开 Godot 自身对应界面
+#
+# 单击仅选中并刷新路径标签；Godot 资源（场景/脚本/tres/着色器等）的跳转会切换
+# 底部面板（场景编辑器/脚本编辑器/Inspector），改为双击才触发。图片/音频的预览
+# 不切换主面板，保留单击即时预览。
 
 func _on_tree_item_selected() -> void:
+	var item := resource_tree.get_selected()
+	if item == null:
+		return
+	var path: String = item.get_meta("full_path", "")
+	if path.is_empty():
+		return
+	path_label.text = path
+	# Godot 资源：仅选中，双击再跳转；图片/音频：单击即预览。
+	if path.get_extension().to_lower() in GODOT_EXTS:
+		return
+	_open_resource(path)
+
+func _on_tree_item_activated() -> void:
 	var item := resource_tree.get_selected()
 	if item == null:
 		return
@@ -254,5 +292,147 @@ func _navigate_to_path(path: String) -> void:
 	var fs := EditorInterface.get_file_system_dock()
 	if fs:
 		fs.navigate_to_path(path)
+
+# ================================================================================
+# 搜索引用 —— 在数据库中搜索当前选中资源被哪些数据项引用。
+# 搜索词为资源的相对路径（相对资源库）与完整 res:// 路径；「全字」= 整值相等，
+# 「区分大小写」= 大小写敏感。结果以 列表（文件 / 引用位置 / 路径）显示在看板中。
+
+func _selected_resource_path() -> String:
+	var item := resource_tree.get_selected()
+	if item == null:
+		return ""
+	return str(item.get_meta("full_path", ""))
+
+func _on_search_option_changed(_v: bool) -> void:
+	# 开关变化时若已有搜索结果，实时重搜。
+	if result_tree.get_root() != null:
+		_search_references()
+
+func _search_references() -> void:
+	var full := _selected_resource_path()
+	_clear_results()
+	if full.is_empty():
+		return
+	var terms := _search_terms(full)
+	if terms.is_empty():
+		return
+	var whole := whole_word_check.button_pressed
+	var case_sensitive := case_sensitive_check.button_pressed
+	var results: Array = []
+	for json_path in _collect_json_files(_importer.get_export_path()):
+		var r = _importer.load_data_file(json_path)
+		if not r.get("ok", false):
+			continue
+		var rows: Dictionary = r.get("data", {}).get("data", {})
+		for id in rows:
+			var row: Dictionary = rows[id]
+			for field in row:
+				var value = row[field]
+				if value is String and _value_matches(value, terms, whole, case_sensitive):
+					results.append({
+						"file": json_path,
+						"id": str(id),
+						"field": str(field),
+					})
+	_display_results(results)
+
+# 相对资源库路径 + 完整路径（去重），作为搜索词。
+func _search_terms(full: String) -> Array:
+	var lib := String(_importer.get_resource_path()).trim_suffix("/") + "/"
+	var rel := full
+	if full.begins_with(lib):
+		rel = full.trim_prefix(lib)
+	var out: Array = []
+	for term in [rel, full]:
+		if not out.has(term):
+			out.append(term)
+	return out
+
+func _value_matches(value: String, terms: Array, whole: bool, case_sensitive: bool) -> bool:
+	var hay: String = value.to_lower() if not case_sensitive else value
+	for term in terms:
+		var needle: String = str(term).to_lower() if not case_sensitive else str(term)
+		if whole:
+			if hay == needle:
+				return true
+		elif hay.contains(needle):
+			return true
+	return false
+
+# 递归收集导出目录下所有 .json（数据库数据文件）。
+func _collect_json_files(dir_path: String) -> Array[String]:
+	var out: Array[String] = []
+	_collect_json_recursive(dir_path, out)
+	return out
+
+func _collect_json_recursive(dir_path: String, out: Array[String]) -> void:
+	var dir := DirAccess.open(dir_path)
+	if not dir:
+		return
+	dir.list_dir_begin()
+	var item := dir.get_next()
+	while item != "":
+		if item == "." or item == "..":
+			item = dir.get_next()
+			continue
+		var full := dir_path.path_join(item)
+		if dir.current_is_dir():
+			_collect_json_recursive(full, out)
+		elif full.get_extension().to_lower() == "json":
+			out.append(full)
+		item = dir.get_next()
+	dir.list_dir_end()
+
+func _clear_results() -> void:
+	result_tree.clear()
+
+func _display_results(results: Array) -> void:
+	var root := result_tree.create_item()
+	if results.is_empty():
+		var empty := result_tree.create_item(root)
+		empty.set_text(0, "未找到引用")
+		empty.set_icon(0, get_theme_icon("file", "FileDialog"))
+		return
+	for res in results:
+		var json_path: String = res["file"]
+		var item := result_tree.create_item(root)
+		item.set_icon(0, get_theme_icon("file", "FileDialog"))
+		item.set_text(0, json_path.get_file())
+		item.set_text(1, str(res["id"]) + "." + str(res["field"]))
+		item.set_text(2, json_path)
+
+# ================================================================================
+# 跳转：从数据预览点击资源路径后，选中资源库中对应文件并滚动到可见。
+# path 为资源库下的完整 res:// 路径（与文件树 item 的 full_path 一致）。
+
+func select_resource(path: String) -> void:
+	var target := path.simplify_path()
+	if target.is_empty():
+		return
+	var item := _find_item_by_path(resource_tree.get_root(), target)
+	if item == null:
+		return
+	# 展开所有祖先文件夹，让目标项可见
+	var p := item.get_parent()
+	while p != null:
+		p.set_collapsed(false)
+		p = p.get_parent()
+	item.select(0)
+	resource_tree.scroll_to_item(item, true)
+
+func _find_item_by_path(item: TreeItem, target: String) -> TreeItem:
+	if item == null:
+		return null
+	var meta: String = str(item.get_meta("full_path", ""))
+	if not meta.is_empty() and meta.simplify_path() == target:
+		return item
+	var child := item.get_first_child()
+	while child != null:
+		var found := _find_item_by_path(child, target)
+		if found != null:
+			return found
+		child = child.get_next()
+	return null
 
 # ================================================================================

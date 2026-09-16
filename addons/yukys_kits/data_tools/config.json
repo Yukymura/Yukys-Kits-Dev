@@ -1,5 +1,6 @@
 {
 	"audio_bg_color": "38cc7340",
+	"data_resource_linked": true,
 	"dock_name": "神奇小工具",
 	"export_path": "res://data",
 	"log_path": "res://addons/yukys_kits/data_tools/logs/import.log",

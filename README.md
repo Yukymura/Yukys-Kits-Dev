@@ -6,6 +6,8 @@
 
 [![Godot](https://img.shields.io/badge/Godot-4.7-478cbf?logo=godot-engine&logoColor=white)](https://godotengine.org/)
 [![Version](https://img.shields.io/badge/version-0.1.0-informational)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-Yukys--Kits--Dev-181717?logo=github)](https://github.com/Yukymura/Yukys-Kits-Dev)
 
 ---
 
@@ -36,7 +38,8 @@
 | 默认设置 Defaults | 配置表 `default` 列 + 类型转换 + 一键重置按钮 | ✅ |
 | AI 导表 AI Import | 注册自定义 MCP 工具 `yukys_export_csv`，AI 指令 `单表导出xxx` 自动导表 | ✅ |
 
-> **依赖 Dependency**：AI 导表功能依赖 [godot_ai](https://github.com/) MCP 插件提供的自定义工具桥接；其余功能无第三方依赖。
+> **依赖 Dependency**：AI 导表功能依赖 **godot_ai**（Godot AI MCP 插件）提供的自定义工具桥接；其余功能无第三方依赖。
+> The AI-import feature depends on the **godot_ai** (Godot AI MCP) plugin for its custom-tool bridge; everything else has no third-party dependencies.
 
 ---
 
@@ -232,12 +235,14 @@ The plugin ships editor regression tests under `tests/`; run them via `test_run`
 
 ## 📄 许可证 · License
 
-> 尚未选择许可证（默认保留所有权利）。No license has been chosen yet (all rights reserved by default).
+本项目采用 [MIT 许可证](LICENSE)。This project is licensed under the [MIT License](LICENSE).
+
+© 2026 [Yukymura](https://github.com/Yukymura)
 
 ---
 
 ## 🙏 致谢 · Credits
 
-- **作者 Author**：[YukymuraZbi](https://github.com/)
+- **作者 Author**：[Yukymura](https://github.com/Yukymura) · **仓库 Repository**：[Yukymura/Yukys-Kits-Dev](https://github.com/Yukymura/Yukys-Kits-Dev)
 - 参考了个人项目中的导表插件实现思路，命名与实现已做优化。
   The data-import workflow is inspired by an earlier personal project, reworked for clarity and robustness.

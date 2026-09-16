@@ -37,9 +37,33 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "未选择文件"
 
+[node name="SearchBar" type="HBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+
+[node name="SearchButton" type="Button" parent="Scroll/VBox/SearchBar"]
+layout_mode = 2
+text = "搜索引用"
+
+[node name="WholeWordCheck" type="CheckBox" parent="Scroll/VBox/SearchBar"]
+layout_mode = 2
+text = "全字"
+
+[node name="CaseSensitiveCheck" type="CheckBox" parent="Scroll/VBox/SearchBar"]
+layout_mode = 2
+text = "区分大小写"
+
 [node name="ResourceTree" type="Tree" parent="Scroll/VBox" unique_id=-920071411]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
 select_mode = 1
+
+[node name="ResultHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+text = "搜索结果"
+
+[node name="ResultTree" type="Tree" parent="Scroll/VBox"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 3

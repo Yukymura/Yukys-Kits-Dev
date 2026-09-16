@@ -12,6 +12,14 @@ extends Control
 
 const TREE_ALLOWED_EXTENSIONS: Array = ["json"]
 
+# 资源库支持的资源扩展名（与 ResourcePreviewDock / GameDB 的分类一致），
+# 用于判断点击的数据项是否为资源库里的资源，从而触发跳转。
+const RESOURCE_EXTS: Array = [
+	"png", "jpg", "jpeg", "webp", "svg", "bmp", "tga", "exr", "hdr", "ktx",
+	"wav", "ogg", "mp3", "flac", "aac",
+	"tres", "res", "tscn", "gdshader", "gd", "cs",
+]
+
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
 var _importer: Variant
@@ -30,6 +38,9 @@ func _ready() -> void:
 
 func _setup() -> void:
 	preview_tree.visible = false
+	# 单元格选择（SELECT_SINGLE）：配合 cell_selected 信号与 get_selected_column()
+	# 知道点了哪一列，从而判断点击的数据项是否为资源路径并触发跳转。
+	preview_tree.select_mode = Tree.SELECT_SINGLE
 
 	_watch_timer = Timer.new()
 	_watch_timer.wait_time = 1.0
@@ -39,6 +50,7 @@ func _setup() -> void:
 
 func _connect_signals() -> void:
 	data_tree.item_selected.connect(_on_tree_item_selected)
+	preview_tree.cell_selected.connect(_on_preview_cell_selected)
 
 func _connect_importer_signals() -> void:
 	if _importer == null:
@@ -107,6 +119,9 @@ func _render(path: String) -> void:
 		row_item.set_text(0, str(index))
 		row_item.set_text(1, str(id))
 		var row_dict: Dictionary = rows[id]
+		# 存原始行数据与字段顺序，供点击单元格时按列还原出真实值，判断是否资源路径。
+		row_item.set_meta("_row", row_dict)
+		row_item.set_meta("_fields", fields)
 		for i in fields.size():
 			row_item.set_text(i + 2, _value_to_text(row_dict.get(fields[i], "")))
 
@@ -211,5 +226,55 @@ func _on_tree_item_selected() -> void:
 	if path.is_empty() or path.get_extension().to_lower() != "json":
 		return
 	_importer.request_preview(path)
+
+# ================================================================================
+# 点击数据项 → 若是资源库中的资源，跳转资源库并选中对应资源项（由设置项控制）
+
+func _on_preview_cell_selected() -> void:
+	if _importer == null:
+		return
+	# 「关联资源跳转」设置项关闭时不跳转。
+	if not bool(_importer.get_setting("data_resource_linked")):
+		return
+	var item := preview_tree.get_selected()
+	if item == null:
+		return
+	var col := preview_tree.get_selected_column()
+	if col < 2:
+		return  # 行号 / key 列不参与跳转
+	var fields: Array = item.get_meta("_fields", [])
+	var idx := col - 2
+	if idx < 0 or idx >= fields.size():
+		return
+	var row: Dictionary = item.get_meta("_row", {})
+	var value = row.get(str(fields[idx]), "")
+	var full := _resource_path_if_in_library(value)
+	if full.is_empty():
+		return
+	_importer.request_navigate_resource(full)
+
+# 若 value 是资源库下的资源文件（图片/音频/Godot 资源），返回其完整 res:// 路径；否则空串。
+func _resource_path_if_in_library(value) -> String:
+	if not value is String:
+		return ""
+	var text: String = value.strip_edges()
+	if text.is_empty():
+		return ""
+	var lib: String = String(_importer.get_resource_path()).trim_suffix("/")
+	var full: String
+	if text.begins_with("res://") or text.begins_with("user://") or text.is_absolute_path():
+		full = text
+	else:
+		full = lib.path_join(text)
+	full = full.simplify_path()
+	# 必须在资源库目录内（"lib/" 结尾的斜杠避免 res://res2 之类误判为 res://res 下）
+	if lib.is_empty() or not (full + "/").begins_with(lib + "/"):
+		return ""
+	# 必须是受支持的资源类型，且真实存在
+	if full.get_extension().to_lower() not in RESOURCE_EXTS:
+		return ""
+	if not FileAccess.file_exists(full):
+		return ""
+	return full
 
 # ================================================================================

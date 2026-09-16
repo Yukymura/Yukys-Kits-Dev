@@ -4,28 +4,32 @@
 			"color": "red",
 			"material": "metal",
 			"mesh": "cube",
-			"name": "cube_red"
+			"name": "cube_red",
+			"texture_path": "pic/啤酒.png"
 		},
 		"1002": {
 			"color": "blue",
 			"material": "metal",
 			"mesh": "cube",
-			"name": "cube_blue"
+			"name": "cube_blue",
+			"texture_path": "pic/弯刀.png"
 		},
 		"1003": {
 			"color": "green",
 			"material": "metal",
 			"mesh": "cube",
-			"name": "cube_green"
+			"name": "cube_green",
+			"texture_path": ""
 		}
 	},
-	"import_path": "res://test_tables/特殊方块数据.csv",
+	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/test_tables/特殊方块数据.csv",
 	"table_name": "key_block_data",
 	"types": {
 		"color": "String",
 		"material": "String",
 		"mesh": "String",
-		"name": "String"
+		"name": "String",
+		"texture_path": "String"
 	},
-	"update_time": "2026-09-11T18:44:57"
+	"update_time": "2026-09-16T21:21:01"
 }

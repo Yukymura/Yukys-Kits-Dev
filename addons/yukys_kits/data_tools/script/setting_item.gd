@@ -31,6 +31,8 @@ func setup(importer, config: Dictionary) -> void:
 	var desc: String = str(config.get("description", ""))
 	if not desc.is_empty():
 		$NameLabel.tooltip_text = desc
+		# Label 默认 mouse_filter 为 IGNORE，不接收鼠标事件，tooltip 不会显示；改为 STOP 让其可悬停。
+		$NameLabel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var reset := _build_reset_button()
 	if reset != null:
 		add_child(reset)

@@ -13,6 +13,7 @@ const DEFAULT_DOCK_NAME := "导表工具"
 
 const PAGE_PREVIEW := "PreviewDock"
 const PAGE_IMPORT := "ImportDock"
+const PAGE_RESOURCE := "ResourcePreviewDock"
 const EXPORT_TOOL_NAME := "yukys_export_csv"
 const EXPORT_TOOL_SCRIPT := "res://addons/yukys_kits/data_tools/script/mcp_export_tool.gd"
 
@@ -94,12 +95,20 @@ func _load_config() -> Dictionary:
 	return r.get("data", {})
 
 func _connect_preview() -> void:
-	if _importer and not _importer.preview_requested.is_connected(_on_preview_requested):
+	if _importer == null:
+		return
+	if not _importer.preview_requested.is_connected(_on_preview_requested):
 		_importer.preview_requested.connect(_on_preview_requested)
+	if not _importer.resource_navigation_requested.is_connected(_on_resource_navigation_requested):
+		_importer.resource_navigation_requested.connect(_on_resource_navigation_requested)
 
 func _disconnect_preview() -> void:
-	if _importer and _importer.preview_requested.is_connected(_on_preview_requested):
+	if _importer == null:
+		return
+	if _importer.preview_requested.is_connected(_on_preview_requested):
 		_importer.preview_requested.disconnect(_on_preview_requested)
+	if _importer.resource_navigation_requested.is_connected(_on_resource_navigation_requested):
+		_importer.resource_navigation_requested.disconnect(_on_resource_navigation_requested)
 
 # ================================================================================
 # AI 导表 —— 注册自定义 MCP 工具「yukys_export_csv」
@@ -143,3 +152,13 @@ func _on_preview_requested(path: String) -> void:
 			preview.show_preview(path)
 		if _main_panel.has_method("show_page"):
 			_main_panel.show_page(PAGE_PREVIEW)
+
+# 点击数据预览里的资源路径后：切到资源库 tab 并选中对应资源项。
+func _on_resource_navigation_requested(path: String) -> void:
+	if _main_panel == null:
+		return
+	var res_page = _main_panel.get_page(PAGE_RESOURCE)
+	if _main_panel.has_method("show_page"):
+		_main_panel.show_page(PAGE_RESOURCE)
+	if res_page and res_page.has_method("select_resource"):
+		res_page.select_resource(path)

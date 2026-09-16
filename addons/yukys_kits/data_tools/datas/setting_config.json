@@ -10,6 +10,16 @@
 			"setting_name": "数据库路径",
 			"type": 3
 		},
+		"1002": {
+			"colume": 1,
+			"data_name": "data_resource_linked",
+			"default": "True",
+			"description": "点击数据视图的资源路径后是否跳转到资源试图",
+			"index": 2,
+			"option": [],
+			"setting_name": "关联资源跳转",
+			"type": 1
+		},
 		"2001": {
 			"colume": 2,
 			"data_name": "resource_path",
@@ -51,7 +61,7 @@
 			"type": 5
 		}
 	},
-	"import_path": "res://addons/yukys_kits/data_tools/chart/设置项配置表.csv",
+	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/addons/yukys_kits/data_tools/chart/设置项配置表.csv",
 	"table_name": "setting_config",
 	"types": {
 		"colume": "int",
@@ -63,5 +73,5 @@
 		"setting_name": "String",
 		"type": "int"
 	},
-	"update_time": "2026-09-14T16:04:13"
+	"update_time": "2026-09-16T19:06:34"
 }

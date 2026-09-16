@@ -6,3 +6,4 @@
 2002,图片背景色,5,pic_bg_color,2,2,,,459fff40
 2003,音频背景色,5,audio_bg_color,2,3,,,38cc7340
 2004,资源背景色,5,res_bg_color,2,4,,,ffa83840
+1002,关联资源跳转,1,data_resource_linked,1,2,点击数据视图的资源路径后是否跳转到资源试图,,True
