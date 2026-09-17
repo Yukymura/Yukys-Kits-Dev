@@ -19,6 +19,7 @@ signal preview_requested(path)
 signal resource_path_changed
 signal resource_colors_changed
 signal resource_navigation_requested(path)
+signal data_item_navigation_requested(path, key)
 
 const CONFIG_PATH := "res://addons/yukys_kits/data_tools/config.json"
 const SETTING_CONFIG_PATH := "res://addons/yukys_kits/data_tools/datas/setting_config.json"
@@ -57,6 +58,10 @@ var res_bg_color: Color = Color(1.0, 0.66, 0.22, 0.25)     # Godot 资源 ——
 # 字段名与「设置项配置表」的 data_name 对齐（data_resource_linked），type=1（勾选框）。
 var data_resource_linked: bool = true
 
+# 「关联数据跳转」开关：资源库搜索看板里点击结果是否跳转到数据库并选中对应数据项。
+# 字段名与「设置项配置表」的 data_name 对齐（resource_data_linked），type=1（勾选框）。
+var resource_data_linked: bool = true
+
 # 设置项默认值（data_name -> 已按类型转换的默认值），来自「设置项配置表」的 default 列。
 # 两大用途：_load_settings() 里作为「用户未设置过」时的回退值；设置界面重置按钮读取。
 var _setting_defaults: Dictionary = {}
@@ -88,6 +93,7 @@ func _load_settings() -> void:
 		audio_bg_color = _parse_color(data.get("audio_bg_color", ""), _setting_defaults.get("audio_bg_color", audio_bg_color))
 		res_bg_color = _parse_color(data.get("res_bg_color", ""), _setting_defaults.get("res_bg_color", res_bg_color))
 		data_resource_linked = _parse_bool(data.get("data_resource_linked", null), _setting_defaults.get("data_resource_linked", true))
+		resource_data_linked = _parse_bool(data.get("resource_data_linked", null), _setting_defaults.get("resource_data_linked", true))
 
 # ================================================================================
 # 导表
@@ -187,6 +193,8 @@ func get_setting(data_name: String) -> Variant:
 			return res_bg_color
 		"data_resource_linked":
 			return data_resource_linked
+		"resource_data_linked":
+			return resource_data_linked
 	return null
 
 func set_setting(data_name: String, value) -> void:
@@ -203,6 +211,9 @@ func set_setting(data_name: String, value) -> void:
 			set_resource_color("godot", value)
 		"data_resource_linked":
 			data_resource_linked = bool(value)
+			_save_config()
+		"resource_data_linked":
+			resource_data_linked = bool(value)
 			_save_config()
 
 # 返回设置项的默认值（来自「设置项配置表」的 default 列，已按类型转换）。
@@ -231,6 +242,10 @@ func request_preview(path: String) -> void:
 # 请求跳转到资源库并选中对应资源项（由数据预览面板在点击资源路径时触发）。
 func request_navigate_resource(path: String) -> void:
 	resource_navigation_requested.emit(path)
+
+# 请求跳转到数据库并选中对应数据文件与数据项（由资源库搜索看板点击结果时触发）。
+func request_navigate_data_item(path: String, key: String) -> void:
+	data_item_navigation_requested.emit(path, key)
 
 # ================================================================================
 # 内部
@@ -266,6 +281,7 @@ func _save_config() -> void:
 	data["audio_bg_color"] = audio_bg_color.to_html(true)
 	data["res_bg_color"] = res_bg_color.to_html(true)
 	data["data_resource_linked"] = data_resource_linked
+	data["resource_data_linked"] = resource_data_linked
 	data.erase("resource_colors")  # 清理旧版嵌套字段
 	Config.save_config(CONFIG_PATH, data)
 

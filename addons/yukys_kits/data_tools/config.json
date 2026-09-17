@@ -12,5 +12,6 @@
 	},
 	"pic_bg_color": "459fff40",
 	"res_bg_color": "ffa83840",
+	"resource_data_linked": true,
 	"resource_path": "res://res"
 }

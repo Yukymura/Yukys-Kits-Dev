@@ -24,6 +24,7 @@ const GODOT_EXTS: Array = ["tres", "res", "tscn", "gdshader", "gd", "cs"]
 @onready var whole_word_check: CheckBox = $Scroll/VBox/SearchBar/WholeWordCheck
 @onready var case_sensitive_check: CheckBox = $Scroll/VBox/SearchBar/CaseSensitiveCheck
 @onready var result_tree: Tree = $Scroll/VBox/ResultTree
+@onready var result_header: Label = $Scroll/VBox/ResultHeader
 
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
@@ -55,14 +56,21 @@ func _setup() -> void:
 func _setup_result_tree() -> void:
 	# 搜索结果看板：3 列（文件 / 引用位置 / 路径），隐藏根节点。
 	result_tree.hide_root = true
+	result_tree.allow_reselect = true
 	result_tree.column_titles_visible = true
 	result_tree.columns = 3
 	result_tree.set_column_title(0, "文件")
 	result_tree.set_column_title(1, "引用")
 	result_tree.set_column_title(2, "路径")
 	result_tree.set_column_expand(0, true)
-	result_tree.set_column_expand(1, false)
+	result_tree.set_column_expand(1, true)
 	result_tree.set_column_expand(2, true)
+	# 未搜索时隐藏「搜索结果」标题与表格，搜索后再显示。
+	_set_results_visible(false)
+
+func _set_results_visible(v: bool) -> void:
+	result_header.visible = v
+	result_tree.visible = v
 
 func _connect_signals() -> void:
 	resource_tree.item_selected.connect(_on_tree_item_selected)
@@ -70,6 +78,7 @@ func _connect_signals() -> void:
 	search_button.pressed.connect(_search_references)
 	whole_word_check.toggled.connect(_on_search_option_changed)
 	case_sensitive_check.toggled.connect(_on_search_option_changed)
+	result_tree.item_selected.connect(_on_result_item_selected)
 
 func _connect_importer_signals() -> void:
 	if _importer == null:
@@ -313,9 +322,11 @@ func _search_references() -> void:
 	var full := _selected_resource_path()
 	_clear_results()
 	if full.is_empty():
+		_set_results_visible(false)
 		return
 	var terms := _search_terms(full)
 	if terms.is_empty():
+		_set_results_visible(false)
 		return
 	var whole := whole_word_check.button_pressed
 	var case_sensitive := case_sensitive_check.button_pressed
@@ -388,6 +399,7 @@ func _clear_results() -> void:
 	result_tree.clear()
 
 func _display_results(results: Array) -> void:
+	_set_results_visible(true)
 	var root := result_tree.create_item()
 	if results.is_empty():
 		var empty := result_tree.create_item(root)
@@ -401,6 +413,25 @@ func _display_results(results: Array) -> void:
 		item.set_text(0, json_path.get_file())
 		item.set_text(1, str(res["id"]) + "." + str(res["field"]))
 		item.set_text(2, json_path)
+		# 记录跳转目标：数据文件路径 + 数据项 key。
+		item.set_meta("_file", json_path)
+		item.set_meta("_key", str(res["id"]))
+
+# 点击搜索结果 → 请求跳转到数据库页并选中对应文件与数据项。
+func _on_result_item_selected() -> void:
+	if _importer == null:
+		return
+	# 「关联数据跳转」设置项关闭时不跳转。
+	if not bool(_importer.get_setting("resource_data_linked")):
+		return
+	var item := result_tree.get_selected()
+	if item == null:
+		return
+	var file: String = str(item.get_meta("_file", ""))
+	if file.is_empty():
+		return
+	var key: String = str(item.get_meta("_key", ""))
+	_importer.request_navigate_data_item(file, key)
 
 # ================================================================================
 # 跳转：从数据预览点击资源路径后，选中资源库中对应文件并滚动到可见。

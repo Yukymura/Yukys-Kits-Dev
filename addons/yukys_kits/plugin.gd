@@ -101,6 +101,8 @@ func _connect_preview() -> void:
 		_importer.preview_requested.connect(_on_preview_requested)
 	if not _importer.resource_navigation_requested.is_connected(_on_resource_navigation_requested):
 		_importer.resource_navigation_requested.connect(_on_resource_navigation_requested)
+	if not _importer.data_item_navigation_requested.is_connected(_on_data_item_navigation_requested):
+		_importer.data_item_navigation_requested.connect(_on_data_item_navigation_requested)
 
 func _disconnect_preview() -> void:
 	if _importer == null:
@@ -109,6 +111,8 @@ func _disconnect_preview() -> void:
 		_importer.preview_requested.disconnect(_on_preview_requested)
 	if _importer.resource_navigation_requested.is_connected(_on_resource_navigation_requested):
 		_importer.resource_navigation_requested.disconnect(_on_resource_navigation_requested)
+	if _importer.data_item_navigation_requested.is_connected(_on_data_item_navigation_requested):
+		_importer.data_item_navigation_requested.disconnect(_on_data_item_navigation_requested)
 
 # ================================================================================
 # AI 导表 —— 注册自定义 MCP 工具「yukys_export_csv」
@@ -162,3 +166,15 @@ func _on_resource_navigation_requested(path: String) -> void:
 		_main_panel.show_page(PAGE_RESOURCE)
 	if res_page and res_page.has_method("select_resource"):
 		res_page.select_resource(path)
+
+# 点击资源库搜索看板的结果后：切到数据库 tab，预览对应数据文件并选中对应数据项。
+func _on_data_item_navigation_requested(path: String, key: String) -> void:
+	if _main_panel == null:
+		return
+	var preview = _main_panel.get_page(PAGE_PREVIEW)
+	if _main_panel.has_method("show_page"):
+		_main_panel.show_page(PAGE_PREVIEW)
+	if preview and preview.has_method("show_preview"):
+		preview.show_preview(path)
+	if preview and preview.has_method("select_row"):
+		preview.select_row(key)

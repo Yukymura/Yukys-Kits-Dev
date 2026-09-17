@@ -278,3 +278,19 @@ func _resource_path_if_in_library(value) -> String:
 	return full
 
 # ================================================================================
+# 跳转：从资源库搜索看板点击结果后，选中数据预览中的对应数据项（按 key 匹配）。
+# 需在 show_preview(path) 之后调用——此时 preview_tree 已按行渲染好，key 在列 1。
+
+func select_row(key: String) -> void:
+	var root := preview_tree.get_root()
+	if root == null:
+		return
+	var child := root.get_first_child()
+	while child != null:
+		if child.get_text(1) == key:
+			child.select(0)
+			preview_tree.scroll_to_item(child, true)
+			return
+		child = child.get_next()
+
+# ================================================================================

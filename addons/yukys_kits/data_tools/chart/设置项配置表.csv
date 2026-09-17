@@ -3,7 +3,8 @@
 *id,setting_name:String,type:int,data_name:String,colume:int,index:int,description:String,option:Array[String],default:String
 1001,数据库路径,3,export_path,1,1,,,res://data
 2001,资源库路径,3,resource_path,2,1,,,res://res
-2002,图片背景色,5,pic_bg_color,2,2,,,459fff40
-2003,音频背景色,5,audio_bg_color,2,3,,,38cc7340
-2004,资源背景色,5,res_bg_color,2,4,,,ffa83840
+2002,图片背景色,5,pic_bg_color,2,3,,,459fff40
+2003,音频背景色,5,audio_bg_color,2,4,,,38cc7340
+2004,资源背景色,5,res_bg_color,2,5,,,ffa83840
 1002,关联资源跳转,1,data_resource_linked,1,2,点击数据视图的资源路径后是否跳转到资源试图,,True
+2005,关联数据跳转,1,resource_data_linked,2,2,点击资源搜索结果后是否跳转到数据试图,,True

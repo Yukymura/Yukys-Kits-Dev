@@ -37,18 +37,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "未选择文件"
 
-[node name="SearchBar" type="HBoxContainer" parent="Scroll/VBox"]
+[node name="SearchBar" type="HBoxContainer" parent="Scroll/VBox" unique_id=1059462768]
 layout_mode = 2
 
-[node name="SearchButton" type="Button" parent="Scroll/VBox/SearchBar"]
+[node name="SearchButton" type="Button" parent="Scroll/VBox/SearchBar" unique_id=1591463833]
 layout_mode = 2
 text = "搜索引用"
 
-[node name="WholeWordCheck" type="CheckBox" parent="Scroll/VBox/SearchBar"]
+[node name="WholeWordCheck" type="CheckBox" parent="Scroll/VBox/SearchBar" unique_id=756445555]
 layout_mode = 2
 text = "全字"
 
-[node name="CaseSensitiveCheck" type="CheckBox" parent="Scroll/VBox/SearchBar"]
+[node name="CaseSensitiveCheck" type="CheckBox" parent="Scroll/VBox/SearchBar" unique_id=1035842674]
 layout_mode = 2
 text = "区分大小写"
 
@@ -58,12 +58,18 @@ layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
 select_mode = 1
+scroll_vertical_enabled = false
 
-[node name="ResultHeader" type="Label" parent="Scroll/VBox"]
+[node name="ResultHeader" type="Label" parent="Scroll/VBox" unique_id=1240705017]
 layout_mode = 2
 text = "搜索结果"
 
-[node name="ResultTree" type="Tree" parent="Scroll/VBox"]
+[node name="ResultTree" type="Tree" parent="Scroll/VBox" unique_id=1882197984]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 3
+columns = 3
+column_titles_visible = true
+allow_reselect = true
+hide_root = true
+select_mode = 1

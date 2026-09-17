@@ -1,3 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# 他人的 Godot-AI 插件(仅本地使用,不入库)
+addons/godot_ai/

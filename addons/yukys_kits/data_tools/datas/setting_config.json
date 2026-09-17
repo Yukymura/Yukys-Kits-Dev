@@ -35,7 +35,7 @@
 			"data_name": "pic_bg_color",
 			"default": "459fff40",
 			"description": "",
-			"index": 2,
+			"index": 3,
 			"option": [],
 			"setting_name": "图片背景色",
 			"type": 5
@@ -45,7 +45,7 @@
 			"data_name": "audio_bg_color",
 			"default": "38cc7340",
 			"description": "",
-			"index": 3,
+			"index": 4,
 			"option": [],
 			"setting_name": "音频背景色",
 			"type": 5
@@ -55,10 +55,20 @@
 			"data_name": "res_bg_color",
 			"default": "ffa83840",
 			"description": "",
-			"index": 4,
+			"index": 5,
 			"option": [],
 			"setting_name": "资源背景色",
 			"type": 5
+		},
+		"2005": {
+			"colume": 2,
+			"data_name": "resource_data_linked",
+			"default": "True",
+			"description": "点击资源搜索结果后是否跳转到数据试图",
+			"index": 2,
+			"option": [],
+			"setting_name": "关联数据跳转",
+			"type": 1
 		}
 	},
 	"import_path": "G:/Work/Godot/GodotProj/Yukys-Kits-Dev/addons/yukys_kits/data_tools/chart/设置项配置表.csv",
@@ -73,5 +83,5 @@
 		"setting_name": "String",
 		"type": "int"
 	},
-	"update_time": "2026-09-16T19:06:34"
+	"update_time": "2026-09-17T14:48:50"
 }
