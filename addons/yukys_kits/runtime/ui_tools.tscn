@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://addons/yukys_kits/runtime/ui_tools.gd" id="1_ui_tools"]
+
+[node name="UITools" type="Node"]
+script = ExtResource("1_ui_tools")

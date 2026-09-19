@@ -24,6 +24,8 @@ config/icon="res://icon.svg"
 
 GameDB="*res://addons/yukys_kits/runtime/game_db.tscn"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+UIManager="*res://addons/yukys_kits/runtime/ui_manager.tscn"
+UITools="*res://addons/yukys_kits/runtime/ui_tools.tscn"
 
 [display]
 
