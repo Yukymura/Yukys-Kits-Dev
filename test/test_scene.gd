@@ -16,6 +16,7 @@
 # 页面：
 #   「数据」tab：下拉列表列出所有数据表，选中后展示整张表；key 搜索框过滤数据行。
 #   「资源」tab：资源文件树（图片/音频/Godot 资源按分类着色），选中后加载并预览。
+#   「UI」tab：创建多个 UI 面板并管理开关/层级/打开栈，展示各面板的 ControlBase 数据。
 # ================================================================================
 
 extends Control
@@ -36,9 +37,28 @@ extends Control
 @onready var resource_status: Label = $Margin/Tabs/ResourceTab/ResResultRow/ResourceStatus
 @onready var audio_player: AudioStreamPlayer = $AudioPlayer
 
+# UI 页
+@onready var ui_create_button: Button = $Margin/Tabs/UITab/UIButtons/CreateButton
+@onready var ui_open_button: Button = $Margin/Tabs/UITab/UIButtons/OpenButton
+@onready var ui_close_button: Button = $Margin/Tabs/UITab/UIButtons/CloseButton
+@onready var ui_toggle_button: Button = $Margin/Tabs/UITab/UIButtons/ToggleButton
+@onready var ui_close_top_button: Button = $Margin/Tabs/UITab/UIButtons/CloseTopButton
+@onready var ui_close_all_button: Button = $Margin/Tabs/UITab/UIButtons/CloseAllButton
+@onready var ui_info_label: Label = $Margin/Tabs/UITab/UIInfo
+
+# 测试用 UI 面板：通过 UITools.spawn_panel 每次新建一个实例（自动生成唯一 panel_id），
+# 交给 UIManager 管理，演示「支持创建多个 UI」与层级/打开栈管理。
+const UI_DEMO_SCENE := "res://test/ui_demo_panel.tscn"
+const UI_DEMO_LAYER := 10
+
+# 最近一次创建的 panel_id（供「打开/关闭/切换」定位）与创建计数（供面板错位摆放）。
+var _last_panel_id: String = ""
+var _spawn_count: int = 0
+
 func _ready() -> void:
 	tabs.set_tab_title(0, "数据")
 	tabs.set_tab_title(1, "资源")
+	tabs.set_tab_title(2, "UI")
 
 	table_selector.item_selected.connect(_on_table_selected)
 	search_box.text_changed.connect(_on_search_changed)
@@ -47,11 +67,19 @@ func _ready() -> void:
 	resource_tree.item_selected.connect(_on_resource_selected)
 	clear_cache_button.pressed.connect(_on_clear_cache_pressed)
 
+	ui_create_button.pressed.connect(_on_ui_create_pressed)
+	ui_open_button.pressed.connect(_on_ui_open_pressed)
+	ui_close_button.pressed.connect(_on_ui_close_pressed)
+	ui_toggle_button.pressed.connect(_on_ui_toggle_pressed)
+	ui_close_top_button.pressed.connect(_on_ui_close_top_pressed)
+	ui_close_all_button.pressed.connect(_on_ui_close_all_pressed)
+
 	res_title.text = "资源库：%s" % GameDB.get_resource_dir()
 
 	_populate_tables()
 	_refresh()
 	_populate_resources()
+	_refresh_ui_info()
 
 # ================================================================================
 # 数据页
@@ -226,3 +254,78 @@ func _on_clear_cache_pressed() -> void:
 	audio_player.stop()
 	sprite_preview.texture = null
 	resource_status.text = "资源缓存已清空（再次选择会重新加载）"
+
+# ================================================================================
+# UI 页
+
+# 创建并打开一个新面板：UITools.spawn_panel 每次新建一个实例（不复用），自动生成唯一
+# panel_id；错位摆放让多个面板叠加时也可见，演示「支持创建多个 UI」。
+func _on_ui_create_pressed() -> void:
+	var panel: ControlBase = UITools.spawn_panel(UI_DEMO_SCENE, UI_DEMO_LAYER, "demo_panel")
+	if panel == null:
+		ui_info_label.text = "创建面板失败（场景 %s 无法加载）" % UI_DEMO_SCENE
+		return
+	_spawn_count += 1
+	var d: int = (_spawn_count - 1) * 28
+	panel.offset_left += d
+	panel.offset_right += d
+	panel.offset_top += d
+	panel.offset_bottom += d
+	panel.open()
+	_last_panel_id = panel.panel_id
+	_refresh_ui_info()
+
+func _on_ui_open_pressed() -> void:
+	if not _last_panel_id.is_empty():
+		UITools.open_panel(_last_panel_id)
+	_refresh_ui_info()
+
+func _on_ui_close_pressed() -> void:
+	if not _last_panel_id.is_empty():
+		UITools.close_panel(_last_panel_id)
+	_refresh_ui_info()
+
+func _on_ui_toggle_pressed() -> void:
+	if not _last_panel_id.is_empty():
+		UITools.toggle_panel(_last_panel_id)
+	_refresh_ui_info()
+
+func _on_ui_close_top_pressed() -> void:
+	UITools.close_top_panel()
+	_refresh_ui_info()
+
+func _on_ui_close_all_pressed() -> void:
+	UITools.close_all()
+	_refresh_ui_info()
+
+# 展示所有已注册面板的 ControlBase 数据（panel_id / layer / open / close_on_cancel / visible），
+# 以及打开栈、最高层面板、取消动作，用于验证 UIManager 的层级与堆叠管理。
+func _refresh_ui_info() -> void:
+	var lines: PackedStringArray = []
+	var ids: Array[String] = UITools.get_panel_ids()
+	lines.append("已注册面板：%d 个" % ids.size())
+	for id in ids:
+		var panel: ControlBase = UITools.get_panel(id)
+		if panel == null:
+			continue
+		lines.append("  · %s：layer=%d  打开=%s  可取消=%s  可见=%s" % [
+			panel.panel_id, panel.layer,
+			str(panel.is_open()), str(panel.close_on_cancel), str(panel.visible)])
+
+	var open_panels: Array[ControlBase] = UITools.get_open_panels()
+	if open_panels.is_empty():
+		lines.append("打开栈（底层→高层）：（空）")
+	else:
+		var parts: PackedStringArray = []
+		for p in open_panels:
+			parts.append(p.panel_id)
+		lines.append("打开栈（底层→高层）：%s" % " → ".join(parts))
+
+	var top: ControlBase = UITools.get_top_panel()
+	if top == null:
+		lines.append("最高层面板：无")
+	else:
+		lines.append("最高层面板：%s（layer=%d）" % [top.panel_id, top.layer])
+
+	lines.append("取消动作（ESC）：%s" % UITools.get_cancel_action())
+	ui_info_label.text = "\n".join(lines)

@@ -7,6 +7,7 @@ const ConfigToolScript := preload("res://addons/yukys_kits/data_tools/tool/confi
 const McpCustomToolSpec := preload("res://addons/godot_ai/custom_tools/mcp_custom_tool_spec.gd")
 const McpToolRegistry := preload("res://addons/godot_ai/custom_tools/mcp_tool_registry.gd")
 const JsonData := preload("res://addons/yukys_kits/runtime/json_data_tool.gd")
+const UIManagerScript := preload("res://addons/yukys_kits/runtime/ui_manager.gd")
 
 const CONFIG_PATH := "res://addons/yukys_kits/data_tools/config.json"
 const DEFAULT_DOCK_NAME := "导表工具"
@@ -76,6 +77,7 @@ func _exit_tree() -> void:
 func _register_project_settings() -> void:
 	_register_dir_setting(JsonData.SETTING_DATA_DIR, JsonData.DEFAULT_DATA_DIR)
 	_register_dir_setting(JsonData.SETTING_RESOURCE_DIR, JsonData.DEFAULT_RESOURCE_DIR)
+	_register_string_setting(UIManagerScript.SETTING_CANCEL_ACTION, UIManagerScript.DEFAULT_CANCEL_ACTION)
 
 func _register_dir_setting(key: String, default_value: String) -> void:
 	if ProjectSettings.has_setting(key):
@@ -86,6 +88,15 @@ func _register_dir_setting(key: String, default_value: String) -> void:
 		"type": TYPE_STRING,
 		"hint": PROPERTY_HINT_DIR,
 		"hint_string": "res://",
+	})
+
+func _register_string_setting(key: String, default_value: String) -> void:
+	if ProjectSettings.has_setting(key):
+		return
+	ProjectSettings.set_setting(key, default_value)
+	ProjectSettings.add_property_info({
+		"name": key,
+		"type": TYPE_STRING,
 	})
 
 func _load_config() -> Dictionary:

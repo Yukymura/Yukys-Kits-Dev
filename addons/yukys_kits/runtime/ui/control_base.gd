@@ -27,6 +27,9 @@ extends Control
 ## 面板层级（数值越大越靠前，供 UIManager 做层级 / 堆叠管理）。
 @export var layer: int = 0
 
+## 是否在按下取消键（ESC）时被 UIManager 优先关闭。默认 true；弹窗/输入类面板可设 false 豁免。
+@export var close_on_cancel: bool = true
+
 # --------------------------------------------------------------------------------
 # 信号
 

@@ -107,4 +107,45 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "在左侧选择资源后加载"
 
+[node name="UITab" type="VBoxContainer" parent="Margin/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="UITitle" type="Label" parent="Margin/Tabs/UITab"]
+layout_mode = 2
+text = "UI 工具测试（UIManager / ControlBase）"
+
+[node name="UIButtons" type="HBoxContainer" parent="Margin/Tabs/UITab"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CreateButton" type="Button" parent="Margin/Tabs/UITab/UIButtons"]
+layout_mode = 2
+text = "创建面板"
+
+[node name="OpenButton" type="Button" parent="Margin/Tabs/UITab/UIButtons"]
+layout_mode = 2
+text = "打开"
+
+[node name="CloseButton" type="Button" parent="Margin/Tabs/UITab/UIButtons"]
+layout_mode = 2
+text = "关闭"
+
+[node name="ToggleButton" type="Button" parent="Margin/Tabs/UITab/UIButtons"]
+layout_mode = 2
+text = "切换"
+
+[node name="CloseTopButton" type="Button" parent="Margin/Tabs/UITab/UIButtons"]
+layout_mode = 2
+text = "关闭最高层"
+
+[node name="CloseAllButton" type="Button" parent="Margin/Tabs/UITab/UIButtons"]
+layout_mode = 2
+text = "全部关闭"
+
+[node name="UIInfo" type="Label" parent="Margin/Tabs/UITab"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "尚未创建面板"
+
 [node name="AudioPlayer" type="AudioStreamPlayer" parent="."]

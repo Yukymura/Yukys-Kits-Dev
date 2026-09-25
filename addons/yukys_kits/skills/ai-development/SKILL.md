@@ -32,6 +32,7 @@ description: 使用 AI 开发 Yuky's Kits 插件（Godot 4.7）时的开发流�
    - `DataImporter` 是编辑器专用实例（`plugin.gd` 里 `new()` 并注入 dock/preview），**不写进 autoload、不随游戏导出**。
 2. **非插件场景只允许调用插件暴露的接口**，禁止调用插件内部接口：
    - ✅ 可用：`GameDB`（`get_table_names()` / `get_table()` / `get_row()` / `get_resource_dir()` / `resolve_resource_path()` / `list_resource_files()` / `get_resource_type()` / `is_resource_file()` / `load_sprite()` / `load_audio()` / `load_resource()` / `clear_resource_cache()`）。
+   - ✅ 可用（UI）：`UIManager` / `UITools`（autoload，`create_panel` / `spawn_panel` / `register_panel` / `unregister_panel` / `open_panel` / `close_panel` / `toggle_panel` / `get_panel` / `has_panel` / `get_panel_ids` / `get_open_panels` / `get_top_panel` / `close_top_panel` / `close_all` / `set_cancel_action`）。
    - ❌ 禁用：`JsonData`、`DataImporter`、`CsvParser`、`ConfigTool`、`Logger` 等内部类。
    - 测试场景缺什么公开能力，就在 `game_db.gd`（运行时）里**新增公开方法**，而不是让测试场景去 `preload` 内部脚本。
 3. **「AI 导表」通过 godot_ai 自定义 MCP 工具桥接**：插件 `_enter_tree` 向 `McpToolRegistry` 注册 `yukys_export_csv`（处理器 `data_tools/script/mcp_export_tool.gd`，经 `plugin.gd` 的静态访问器拿 importer/主面板）。所有 AI 指令的权威清单在 `skills/ai-commands/SKILL.md`；改导表或页面切换逻辑时，记得同步该工具、`ai-commands` 指令清单与 `skills/excel-import/SKILL.md` 的「AI 导表」章节。
@@ -88,11 +89,12 @@ return {
 4. **`project_run` 偶尔返回 `stopped`**，或游戏跑几秒就停——多为 MCP 桥接/焦点时序问题而非代码 bug。确认游戏是否真的 launch：看 `logs_read(source='all')` 里有没有 `mcp:hello from game_helper`；没有脚本报错（`source='editor'` 为空、`godot.log` 无 `SCRIPT ERROR`）就重跑。
 5. **新增 `.gd`/`.tscn` 后编辑器会重新导入**（`readiness -> importing`），可能打断刚发起的 run，重跑即可。
 6. **`game_manage` 的 `op=debug_status` 映射有误**（内部报 `Unknown command: game_debug_control`），改用 `get_scene_tree` / `get_ui_elements` / `game_eval`。
+7. **`:=` 推断遇到 Variant 值会直接报错**（本环境实测为 `SCRIPT ERROR: Parse Error`）：对动态值——`get_node_or_null()`、字典 `.get()`、未标注类型的 `var`、preload 脚本 `new()` 赋给无类型变量后再取成员等——**不能用 `:=`**，改用显式标注 `var x: Type = ...` 或普通 `var x = ...`。公开函数签名的返回类型标注不受影响。
 
 ## 代码规范
 
 - **注释用中文**，顶部用 `# ====...` 分隔块注释说明文件职责与关键用法（照抄现有文件风格）。
-- **命名 snake_case**；变量用类型推断 `:=`，类型标注只加在公开函数签名与 `@onready`。
+- **命名 snake_case**；变量用类型推断 `:=`（遇 Variant 值不能用，见「常见坑」第 7 条），类型标注只加在公开函数签名与 `@onready`。
 - **统一结果模式**：返回 `{ "ok": true, "data": ... }` 或 `{ "ok": false, "error": "原因" }`，用 `_ok(data)` / `_fail(reason)` 辅助函数（见 `json_data_tool.gd`）。
 - **CSV → 类型** 双向转换集中在 `json_data_tool.gd`：写方向 `cell_to_value`、读方向 `json_to_value` 两个 `match`，新增类型改这里。
 - **字段过滤规则**（`#` 前缀、空行）集中在 `csv_parser.gd`。

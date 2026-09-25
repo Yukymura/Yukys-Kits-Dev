@@ -2,10 +2,11 @@
 1.UIManager 
 目的：统一化管理；可拓展化；控制节点数量，改善性能
 
+UI组装逻辑：
+-用户正常按照Godot原流程(使用Godot内置的Control类节点)制作UI场景
+-用户若使用插件的接口创建UI，件负责将本UI挂载到ControlBase上，受UIManager管理
+
 UI层级逻辑：
 -高层UI显示在低层UI之上
 -按下ESC(可设置)优先关闭高层UI
-
-创建UI相关字段：
--backgroud = {}在该UI底层创建纯色背景，{"color": color,"alpha": a}表示创建color色的不透明度为alpha的纯色ColorRect
 ================================================================
