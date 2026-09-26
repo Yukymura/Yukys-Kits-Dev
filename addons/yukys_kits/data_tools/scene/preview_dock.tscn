@@ -42,6 +42,23 @@ layout_mode = 2
 select_mode = 1
 scroll_vertical_enabled = false
 
+[node name="SearchBar" type="HBoxContainer" parent="Scroll/VBox" unique_id=1452393200]
+visible = false
+layout_mode = 2
+
+[node name="SearchInput" type="LineEdit" parent="Scroll/VBox/SearchBar" unique_id=1452393201]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "搜索数据…"
+
+[node name="WholeWordCheck" type="CheckBox" parent="Scroll/VBox/SearchBar" unique_id=1452393202]
+layout_mode = 2
+text = "全字"
+
+[node name="CaseSensitiveCheck" type="CheckBox" parent="Scroll/VBox/SearchBar" unique_id=1452393203]
+layout_mode = 2
+text = "区分大小写"
+
 [node name="PreviewTree" type="Tree" parent="Scroll/VBox" unique_id=133119907]
 visible = false
 layout_mode = 2

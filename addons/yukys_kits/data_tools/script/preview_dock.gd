@@ -9,6 +9,10 @@ extends Control
 @onready var path_label: Label = $Scroll/VBox/Header/PathLabel
 @onready var preview_tree: Tree = $Scroll/VBox/PreviewTree
 @onready var data_tree: Tree = $Scroll/VBox/DataTree
+@onready var search_bar: HBoxContainer = $Scroll/VBox/SearchBar
+@onready var search_input: LineEdit = $Scroll/VBox/SearchBar/SearchInput
+@onready var whole_word_check: CheckBox = $Scroll/VBox/SearchBar/WholeWordCheck
+@onready var case_sensitive_check: CheckBox = $Scroll/VBox/SearchBar/CaseSensitiveCheck
 
 const TREE_ALLOWED_EXTENSIONS: Array = ["json"]
 
@@ -23,6 +27,9 @@ const RESOURCE_EXTS: Array = [
 var _watch_timer: Timer
 var _dir_snapshot: Dictionary = {}
 var _importer: Variant
+# 当前预览数据（供搜索过滤时重建表格用）：info = 加载成功的 { data, types }；error 非空表示加载失败。
+var _current_info: Dictionary = {}
+var _current_error: String = ""
 
 func set_importer(importer) -> void:
 	_importer = importer
@@ -51,6 +58,9 @@ func _setup() -> void:
 func _connect_signals() -> void:
 	data_tree.item_selected.connect(_on_tree_item_selected)
 	preview_tree.cell_selected.connect(_on_preview_cell_selected)
+	search_input.text_changed.connect(_on_search_changed)
+	whole_word_check.toggled.connect(_on_search_option_changed)
+	case_sensitive_check.toggled.connect(_on_search_option_changed)
 
 func _connect_importer_signals() -> void:
 	if _importer == null:
@@ -67,27 +77,38 @@ func show_preview(path: String) -> void:
 	_render(path)
 
 func _render(path: String) -> void:
+	# 缓存当前加载结果，搜索过滤时据此重建表格（不重复读盘）。
+	_current_info = {}
+	_current_error = ""
 	if _importer == null:
 		return
-	preview_tree.clear()
-	preview_tree.hide_root = true
 	var r: Dictionary = _importer.load_data_file(path)
 	if not r.ok:
+		_current_error = str(r.error)
+	else:
+		_current_info = r.data
+	_rebuild_preview()
+
+func _rebuild_preview() -> void:
+	preview_tree.clear()
+	preview_tree.hide_root = true
+	# 加载失败：显示错误行，隐藏搜索栏。
+	if _current_error != "":
 		preview_tree.visible = true
 		preview_tree.columns = 1
 		preview_tree.set_column_title(0, "错误")
 		var _root := preview_tree.create_item()
 		var err_item := preview_tree.create_item(_root)
-		err_item.set_text(0, "加载失败: %s" % str(r.error))
+		err_item.set_text(0, "加载失败: %s" % _current_error)
+		_set_search_visible(false)
 		return
-	var info: Dictionary = r.data
-	var rows: Dictionary = info.get("data", {})
-	var types: Dictionary = info.get("types", {})
+	var rows: Dictionary = _current_info.get("data", {})
+	var types: Dictionary = _current_info.get("types", {})
 	# 没有数据行时隐藏表格
 	if rows.is_empty():
 		preview_tree.visible = false
+		_set_search_visible(false)
 		return
-	preview_tree.visible = true
 	# 字段列顺序以 JSON 的 types 键序为准（= 原 CSV 字段顺序），
 	# 再兜底补充数据行里出现但 types 缺失的字段。
 	var fields: Array = []
@@ -100,6 +121,14 @@ func _render(path: String) -> void:
 		for field in rows[id]:
 			if not fields.has(field):
 				fields.append(field)
+	# 搜索过滤：匹配 key 与各字段值（行号列除外）。
+	var matched := ids
+	var term := search_input.text.strip_edges()
+	if not term.is_empty():
+		matched = []
+		for id in ids:
+			if _row_matches(id, rows[id], fields, term):
+				matched.append(id)
 	# 列布局：0=行号，1=id，2..=字段（与原表列顺序一致）
 	preview_tree.columns = 2 + fields.size()
 	preview_tree.set_column_title(0, "行号")
@@ -113,7 +142,7 @@ func _render(path: String) -> void:
 		preview_tree.set_column_expand(i + 2, true)
 	var root := preview_tree.create_item()
 	var index := 0
-	for id in ids:
+	for id in matched:
 		index += 1
 		var row_item := preview_tree.create_item(root)
 		row_item.set_text(0, str(index))
@@ -124,6 +153,8 @@ func _render(path: String) -> void:
 		row_item.set_meta("_fields", fields)
 		for i in fields.size():
 			row_item.set_text(i + 2, _value_to_text(row_dict.get(fields[i], "")))
+	preview_tree.visible = true
+	_set_search_visible(true)
 
 func _value_to_text(value) -> String:
 	if value is Array:
@@ -132,6 +163,41 @@ func _value_to_text(value) -> String:
 			parts.append(_value_to_text(e))
 		return ";".join(parts)
 	return str(value)
+
+# ================================================================================
+# 搜索 —— 在当前预览数据中搜索（行号列除外），实时过滤表格行。
+
+func _set_search_visible(v: bool) -> void:
+	search_bar.visible = v
+
+func _on_search_changed(_text: String) -> void:
+	_rebuild_preview()
+
+func _on_search_option_changed(_v: bool) -> void:
+	# 开关变化时若已有预览内容，实时重搜。
+	if preview_tree.visible:
+		_rebuild_preview()
+
+# 一行是否命中搜索词：key 与各字段值参与匹配，行号不参与。
+func _row_matches(id, row: Dictionary, fields: Array, term: String) -> bool:
+	var whole := whole_word_check.button_pressed
+	var case_sensitive := case_sensitive_check.button_pressed
+	if _value_matches(id, term, whole, case_sensitive):
+		return true
+	for f in fields:
+		if _value_matches(row.get(f, ""), term, whole, case_sensitive):
+			return true
+	return false
+
+# 单值匹配：数组先按显示文本（";" 连接）比较；「全字」= 整值相等，「区分大小写」= 大小写敏感。
+func _value_matches(value, term: String, whole: bool, case_sensitive: bool) -> bool:
+	var text: String = _value_to_text(value)
+	if not case_sensitive:
+		text = text.to_lower()
+		term = term.to_lower()
+	if whole:
+		return text == term
+	return text.contains(term)
 
 # ================================================================================
 # 数据树
@@ -282,6 +348,10 @@ func _resource_path_if_in_library(value) -> String:
 # 需在 show_preview(path) 之后调用——此时 preview_tree 已按行渲染好，key 在列 1。
 
 func select_row(key: String) -> void:
+	# 清除搜索过滤，确保目标行可见。
+	if not search_input.text.is_empty():
+		search_input.text = ""
+		_rebuild_preview()
 	var root := preview_tree.get_root()
 	if root == null:
 		return
